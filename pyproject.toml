@@ -1,0 +1,27 @@
+[project]
+name = "logseq-mcp"
+version = "0.1.0"
+description = "Python MCP server for Logseq — replaces graphthulhu"
+readme = "README.md"
+authors = [
+    { name = "Andrej Berg", email = "mail@andrej-berg.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+logseq-mcp = "logseq_mcp.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.10.4,<0.11.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
