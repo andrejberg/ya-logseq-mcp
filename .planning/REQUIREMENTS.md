@@ -99,34 +99,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUN-01 | — | Pending |
-| FOUN-02 | — | Pending |
-| FOUN-03 | — | Pending |
-| FOUN-04 | — | Pending |
-| FOUN-05 | — | Pending |
-| FOUN-06 | — | Pending |
-| FOUN-07 | — | Pending |
-| FOUN-08 | — | Pending |
-| READ-01 | — | Pending |
-| READ-02 | — | Pending |
-| READ-03 | — | Pending |
-| READ-04 | — | Pending |
-| READ-05 | — | Pending |
-| READ-06 | — | Pending |
-| WRIT-01 | — | Pending |
-| WRIT-02 | — | Pending |
-| WRIT-03 | — | Pending |
-| WRIT-04 | — | Pending |
-| WRIT-05 | — | Pending |
-| INTG-01 | — | Pending |
-| INTG-02 | — | Pending |
-| INTG-03 | — | Pending |
+| FOUN-01 | Phase 1 | Pending |
+| FOUN-02 | Phase 1 | Pending |
+| FOUN-03 | Phase 1 | Pending |
+| FOUN-04 | Phase 1 | Pending |
+| FOUN-05 | Phase 1 | Pending |
+| FOUN-06 | Phase 1 | Pending |
+| FOUN-07 | Phase 1 | Pending |
+| FOUN-08 | Phase 1 | Pending |
+| READ-01 | Phase 2 | Pending |
+| READ-02 | Phase 2 | Pending |
+| READ-03 | Phase 2 | Pending |
+| READ-04 | Phase 2 | Pending |
+| READ-05 | Phase 2 | Pending |
+| READ-06 | Phase 2 | Pending |
+| WRIT-01 | Phase 3 | Pending |
+| WRIT-02 | Phase 3 | Pending |
+| WRIT-03 | Phase 3 | Pending |
+| WRIT-04 | Phase 3 | Pending |
+| WRIT-05 | Phase 3 | Pending |
+| INTG-01 | Phase 4 | Pending |
+| INTG-02 | Phase 4 | Pending |
+| INTG-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22 ⚠️
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation*
