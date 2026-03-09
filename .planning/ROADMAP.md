@@ -29,11 +29,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All server output goes to stderr; stdout carries only MCP protocol messages
   4. Requests to a stopped Logseq instance fail gracefully with a clear error (no crash, no hang)
   5. Pydantic models parse both `{"id": N}` and bare `N` response formats without error
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Pydantic types + test scaffold (Wave 1)
+- [ ] 01-02-PLAN.md — LogseqClient with retry, semaphore, auth (Wave 2)
+- [ ] 01-03-PLAN.md — FastMCP server, health tool, lifespan (Wave 3)
 
 ### Phase 2: Core Reads
 **Goal**: Users can read pages, blocks, page lists, and backlinks with correct deduplicated block trees
@@ -87,7 +88,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/3 | Not started | - |
 | 2. Core Reads | 0/? | Not started | - |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Integration and Swap | 0/? | Not started | - |
