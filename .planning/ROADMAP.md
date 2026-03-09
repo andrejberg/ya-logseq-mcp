@@ -13,7 +13,7 @@ This roadmap delivers a Python MCP server that replaces graphthulhu for daily-dr
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Async client, Pydantic types, MCP server skeleton, and health tool (completed 2026-03-09)
-- [ ] **Phase 2: Core Reads** - Deduplicated page reads, block retrieval, page listing, and backlinks
+- [x] **Phase 2: Core Reads** - Deduplicated page reads, block retrieval, page listing, and backlinks (completed 2026-03-09)
 - [ ] **Phase 3: Write Tools** - Page and block CRUD with correct hierarchy
 - [ ] **Phase 4: Integration and Swap** - End-to-end verification, parity testing, graphthulhu replacement
 
@@ -51,7 +51,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — test_core.py: failing test stubs for READ-01 through READ-06 (Wave 1)
 - [x] 02-02-PLAN.md — get_page with deduplication helpers (Wave 2)
-- [ ] 02-03-PLAN.md — get_block, list_pages, get_references (Wave 3)
+- [x] 02-03-PLAN.md — get_block, list_pages, get_references (Wave 3)
 
 ### Phase 3: Write Tools
 **Goal**: Users can create pages, append/update/delete blocks with correct Logseq hierarchy
@@ -90,6 +90,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
-| 2. Core Reads | 2/3 | In Progress|  |
+| 2. Core Reads | 3/3 | Complete | 2026-03-09 |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Integration and Swap | 0/? | Not started | - |
