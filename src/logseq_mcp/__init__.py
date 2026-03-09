@@ -1,2 +1,1 @@
-def hello() -> str:
-    return "Hello from logseq-mcp!"
+"""logseq-mcp: Custom Python MCP server for Logseq."""
