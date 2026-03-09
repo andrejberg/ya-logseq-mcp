@@ -49,8 +49,8 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — test_core.py: failing test stubs for READ-01 through READ-06 (Wave 1)
-- [ ] 02-02-PLAN.md — get_page with deduplication helpers (Wave 2)
+- [x] 02-01-PLAN.md — test_core.py: failing test stubs for READ-01 through READ-06 (Wave 1)
+- [x] 02-02-PLAN.md — get_page with deduplication helpers (Wave 2)
 - [ ] 02-03-PLAN.md — get_block, list_pages, get_references (Wave 3)
 
 ### Phase 3: Write Tools
@@ -90,6 +90,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
-| 2. Core Reads | 1/3 | In Progress|  |
+| 2. Core Reads | 2/3 | In Progress|  |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Integration and Swap | 0/? | Not started | - |

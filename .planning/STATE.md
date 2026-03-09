@@ -2,15 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 02-core-reads-02-01-PLAN.md
-last_updated: "2026-03-09T22:01:27.687Z"
-last_activity: 2026-03-09 -- Phase 1 complete (human-verify approved)
+current_phase: 2
+current_phase_name: Core Reads
+current_plan: 2
+status: executing
+stopped_at: Completed 02-core-reads-02-02-PLAN.md
+last_updated: "2026-03-09T22:13:56.022Z"
+last_activity: 2026-03-09
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 100
 ---
 
@@ -25,12 +28,15 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 
 ## Current Position
 
-Phase: 2 of 4 (Core Reads)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-09 -- Phase 1 complete (human-verify approved)
+**Current Phase:** 2
+**Current Phase Name:** Core Reads
+**Total Phases:** 4
+**Current Plan:** 2
+**Total Plans in Phase:** 3
+**Status:** Ready to execute
+**Last Activity:** 2026-03-09 -- Completed 02-core-reads-02-02-PLAN.md
 
-Progress: [██████████] 100% (Phase 1 complete)
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -54,6 +60,7 @@ Progress: [██████████] 100% (Phase 1 complete)
 | Phase 01-foundation P02 | 1min | 2 tasks | 2 files |
 | Phase 01-foundation P03 | 2min | 2 tasks | 5 files |
 | Phase 02-core-reads P01 | 3 | 1 tasks | 1 files |
+| Phase 02-core-reads P02 | 5min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +79,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Bottom-of-file tool module import in server.py avoids circular import since tools/core.py imports mcp from server
 - [Phase 01-foundation]: AppContext is a plain dataclass (not Pydantic) for internal server context — no validation overhead needed
 - [Phase 02-core-reads]: Import inside test body to allow collection of all 6 tests even when impl is missing
+- [Phase 02-core-reads]: Deduplicate get_page block trees with a single shared seen UUID set across the full parsed tree
+- [Phase 02-core-reads]: Preserve API block nesting by filtering already-parsed BlockEntity.children instead of rebuilding tree structure
+- [Phase 02-core-reads]: Raise McpError when getPage returns None so missing pages fail explicitly
 
 ### Pending Todos
 
@@ -83,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T22:01:27.685Z
-Stopped at: Completed 02-core-reads-02-01-PLAN.md
-Resume file: None
+Last session: 2026-03-09T22:13:56.020Z
+**Stopped At:** Completed 02-core-reads-02-02-PLAN.md
+**Resume File:** None
