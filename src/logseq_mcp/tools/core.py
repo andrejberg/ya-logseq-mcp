@@ -103,3 +103,79 @@ async def get_block(ctx: Context, uuid: str, include_children: bool = True) -> s
 
     block = BlockEntity.model_validate(raw)
     return json.dumps(block.model_dump(by_alias=False))
+
+
+@mcp.tool()
+async def list_pages(
+    ctx: Context,
+    namespace: str = "",
+    include_journals: bool = False,
+    limit: int = 50,
+) -> str:
+    """List pages with optional namespace filter."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("list_pages: namespace=%r limit=%d", namespace, limit)
+
+    raw = await client._call("logseq.Editor.getAllPages")
+    pages_raw = raw if isinstance(raw, list) else []
+
+    pages: list[PageEntity] = []
+    for page_raw in pages_raw:
+        page = PageEntity.model_validate(page_raw)
+        if not page.name:
+            continue
+        if not include_journals and page.journal:
+            continue
+        if namespace and not page.name.lower().startswith(namespace.lower()):
+            continue
+        pages.append(page)
+
+    pages.sort(key=lambda page: page.name.lower())
+    if limit > 0:
+        pages = pages[:limit]
+
+    result = [
+        {
+            "name": page.original_name or page.name,
+            "journal": page.journal,
+            "properties": page.properties,
+        }
+        for page in pages
+    ]
+    return json.dumps(result)
+
+
+@mcp.tool()
+async def get_references(ctx: Context, name: str) -> str:
+    """Get backlinks to a page (pages that reference this page)."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("get_references: %s", name)
+
+    raw = await client._call("logseq.Editor.getPageLinkedReferences", name)
+    if not isinstance(raw, list):
+        return json.dumps([])
+
+    backlinks = []
+    for ref in raw:
+        if not isinstance(ref, list) or len(ref) < 2:
+            continue
+
+        page_raw, blocks_raw = ref[0], ref[1]
+        try:
+            page = PageEntity.model_validate(page_raw)
+            blocks = [BlockEntity.model_validate(block_raw) for block_raw in (blocks_raw or [])]
+        except Exception:
+            continue
+
+        backlinks.append(
+            {
+                "page": page.original_name or page.name,
+                "blocks": [{"uuid": block.uuid, "content": block.content} for block in blocks],
+            }
+        )
+
+    return json.dumps(backlinks)
