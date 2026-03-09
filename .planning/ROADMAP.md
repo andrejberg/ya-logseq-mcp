@@ -46,11 +46,12 @@ Plans:
   3. `get_block` returns a single block by UUID, including its children when requested
   4. `list_pages` returns filtered page lists (by namespace at minimum)
   5. `get_references` returns backlinks for a given page name
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — test_core.py: failing test stubs for READ-01 through READ-06 (Wave 1)
+- [ ] 02-02-PLAN.md — get_page with deduplication helpers (Wave 2)
+- [ ] 02-03-PLAN.md — get_block, list_pages, get_references (Wave 3)
 
 ### Phase 3: Write Tools
 **Goal**: Users can create pages, append/update/delete blocks with correct Logseq hierarchy
@@ -89,6 +90,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
-| 2. Core Reads | 0/? | Not started | - |
+| 2. Core Reads | 0/3 | Not started | - |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Integration and Swap | 0/? | Not started | - |
