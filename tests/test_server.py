@@ -1,20 +1,103 @@
-"""Unit test stubs for MCP server + lifespan (FOUN-05, FOUN-06, FOUN-08).
-
-These tests will be fully implemented in plan 03 when server.py exists.
-"""
-
+import asyncio
+import json
+import sys
 import pytest
-
-pytest.importorskip("logseq_mcp.server", reason="server not yet implemented")
-
-
-@pytest.mark.xfail(reason="server not yet implemented", strict=False)
-def test_tool_registered(): ...
+import httpx
+from unittest.mock import AsyncMock, patch
 
 
-@pytest.mark.xfail(reason="server not yet implemented", strict=False)
-def test_stderr_only(): ...
+@pytest.fixture
+def token_env(monkeypatch):
+    monkeypatch.setenv("LOGSEQ_API_TOKEN", "test-token")
 
 
-@pytest.mark.xfail(reason="server not yet implemented", strict=False)
-def test_lifespan_closes_client(): ...
+def test_tool_registered(token_env):
+    """health tool must be registered on the FastMCP instance."""
+    from logseq_mcp.server import mcp
+    # FastMCP stores tools in _tool_manager; access via internal registry
+    tool_names = list(mcp._tool_manager._tools.keys())
+    assert "health" in tool_names, f"health not in tools: {tool_names}"
+
+
+def test_stderr_only(token_env, capsys):
+    """Importing server modules must not write to stdout."""
+    # Re-import to trigger any module-level side effects
+    import importlib
+    import logseq_mcp.server
+    importlib.reload(logseq_mcp.server)
+    captured = capsys.readouterr()
+    assert captured.out == "", f"stdout contaminated: {captured.out!r}"
+
+
+@pytest.mark.asyncio
+async def test_lifespan_closes_client(token_env):
+    """httpx.AsyncClient must be closed after lifespan context exits."""
+    from logseq_mcp.server import lifespan, mcp, AppContext
+    closed_calls = []
+
+    original_aclose = httpx.AsyncClient.aclose
+
+    async def tracking_aclose(self):
+        closed_calls.append(True)
+        await original_aclose(self)
+
+    with patch.object(httpx.AsyncClient, "aclose", tracking_aclose):
+        async with lifespan(mcp) as ctx:
+            assert isinstance(ctx, AppContext)
+            assert ctx.client._http is not None
+
+    assert len(closed_calls) >= 1, "httpx.AsyncClient.aclose() was not called"
+
+
+@pytest.mark.asyncio
+async def test_health_returns_json(token_env):
+    """health tool returns JSON with status, graph, page_count."""
+    from logseq_mcp.tools.core import health
+
+    # Mock the client._call to return fake Logseq responses
+    async def fake_call(method, *args):
+        if method == "logseq.App.getCurrentGraph":
+            return {"name": "test-graph", "path": "/graphs/test"}
+        if method == "logseq.Editor.getAllPages":
+            return [{"name": "page1"}, {"name": "page2"}, {"name": "page3"}]
+        return None
+
+    # Build a mock context
+    mock_client = AsyncMock()
+    mock_client._call = fake_call
+
+    from dataclasses import dataclass
+    from logseq_mcp.server import AppContext
+
+    mock_ctx = AsyncMock()
+    mock_ctx.request_context.lifespan_context = AppContext(client=mock_client)
+
+    result = await health(mock_ctx)
+    data = json.loads(result)
+
+    assert data["status"] == "ok"
+    assert data["graph"] == "test-graph"
+    assert data["page_count"] == 3
+
+
+@pytest.mark.asyncio
+async def test_health_on_unreachable_logseq(token_env):
+    """health tool raises McpError when Logseq is unreachable."""
+    from mcp import McpError
+    from logseq_mcp.tools.core import health
+    from logseq_mcp.server import AppContext
+
+    # Use the real client but patch _call to raise
+    mock_client = AsyncMock()
+    from mcp.types import ErrorData, INTERNAL_ERROR
+    mock_client._call.side_effect = McpError(
+        ErrorData(code=INTERNAL_ERROR, message="Logseq is not running or unreachable at http://127.0.0.1:12315")
+    )
+
+    mock_ctx = AsyncMock()
+    mock_ctx.request_context.lifespan_context = AppContext(client=mock_client)
+
+    with pytest.raises(McpError) as exc_info:
+        await health(mock_ctx)
+
+    assert "not running or unreachable" in str(exc_info.value)
