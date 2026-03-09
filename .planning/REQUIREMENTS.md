@@ -12,7 +12,7 @@ Requirements for initial release (graphthulhu swap threshold). 9 tools total.
 - [ ] **FOUN-01**: Async HTTP client connects to Logseq API with Bearer token auth
 - [ ] **FOUN-02**: Client retries on 5xx errors with exponential backoff (100ms initial, 3 retries)
 - [ ] **FOUN-03**: Client serializes requests with asyncio.Semaphore(1) to avoid Logseq UI freezes
-- [ ] **FOUN-04**: Pydantic models handle polymorphic API responses (both `{"id": N}` and bare `N` formats)
+- [x] **FOUN-04**: Pydantic models handle polymorphic API responses (both `{"id": N}` and bare `N` formats)
 - [ ] **FOUN-05**: MCP server registers tools via FastMCP `@mcp.tool()` decorators
 - [ ] **FOUN-06**: All logging goes to stderr only (stdout breaks MCP protocol)
 - [ ] **FOUN-07**: `health` tool pings Logseq and returns graph name + page count
@@ -102,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-01 | Phase 1 | Pending |
 | FOUN-02 | Phase 1 | Pending |
 | FOUN-03 | Phase 1 | Pending |
-| FOUN-04 | Phase 1 | Pending |
+| FOUN-04 | Phase 1 | Complete |
 | FOUN-05 | Phase 1 | Pending |
 | FOUN-06 | Phase 1 | Pending |
 | FOUN-07 | Phase 1 | Pending |
