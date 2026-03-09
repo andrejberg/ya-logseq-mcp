@@ -12,7 +12,7 @@ This roadmap delivers a Python MCP server that replaces graphthulhu for daily-dr
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Async client, Pydantic types, MCP server skeleton, and health tool
+- [x] **Phase 1: Foundation** - Async client, Pydantic types, MCP server skeleton, and health tool (completed 2026-03-09)
 - [ ] **Phase 2: Core Reads** - Deduplicated page reads, block retrieval, page listing, and backlinks
 - [ ] **Phase 3: Write Tools** - Page and block CRUD with correct hierarchy
 - [ ] **Phase 4: Integration and Swap** - End-to-end verification, parity testing, graphthulhu replacement
@@ -88,7 +88,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress|  |
+| 1. Foundation | 3/3 | Complete   | 2026-03-09 |
 | 2. Core Reads | 0/? | Not started | - |
 | 3. Write Tools | 0/? | Not started | - |
 | 4. Integration and Swap | 0/? | Not started | - |

@@ -13,10 +13,10 @@ Requirements for initial release (graphthulhu swap threshold). 9 tools total.
 - [x] **FOUN-02**: Client retries on 5xx errors with exponential backoff (100ms initial, 3 retries)
 - [x] **FOUN-03**: Client serializes requests with asyncio.Semaphore(1) to avoid Logseq UI freezes
 - [x] **FOUN-04**: Pydantic models handle polymorphic API responses (both `{"id": N}` and bare `N` formats)
-- [ ] **FOUN-05**: MCP server registers tools via FastMCP `@mcp.tool()` decorators
-- [ ] **FOUN-06**: All logging goes to stderr only (stdout breaks MCP protocol)
-- [ ] **FOUN-07**: `health` tool pings Logseq and returns graph name + page count
-- [ ] **FOUN-08**: Server manages httpx.AsyncClient lifecycle via FastMCP lifespan
+- [x] **FOUN-05**: MCP server registers tools via FastMCP `@mcp.tool()` decorators
+- [x] **FOUN-06**: All logging goes to stderr only (stdout breaks MCP protocol)
+- [x] **FOUN-07**: `health` tool pings Logseq and returns graph name + page count
+- [x] **FOUN-08**: Server manages httpx.AsyncClient lifecycle via FastMCP lifespan
 
 ### Core Reads
 
@@ -103,10 +103,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-02 | Phase 1 | Complete |
 | FOUN-03 | Phase 1 | Complete |
 | FOUN-04 | Phase 1 | Complete |
-| FOUN-05 | Phase 1 | Pending |
-| FOUN-06 | Phase 1 | Pending |
-| FOUN-07 | Phase 1 | Pending |
-| FOUN-08 | Phase 1 | Pending |
+| FOUN-05 | Phase 1 | Complete |
+| FOUN-06 | Phase 1 | Complete |
+| FOUN-07 | Phase 1 | Complete |
+| FOUN-08 | Phase 1 | Complete |
 | READ-01 | Phase 2 | Pending |
 | READ-02 | Phase 2 | Pending |
 | READ-03 | Phase 2 | Pending |
