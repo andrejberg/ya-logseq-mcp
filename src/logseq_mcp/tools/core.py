@@ -86,3 +86,20 @@ async def get_page(ctx: Context, name: str) -> str:
             "block_count": _count_blocks(blocks),
         }
     )
+
+
+@mcp.tool()
+async def get_block(ctx: Context, uuid: str, include_children: bool = True) -> str:
+    """Get a single block by UUID."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("get_block: %s", uuid)
+
+    opts = {"includeChildren": include_children}
+    raw = await client._call("logseq.Editor.getBlock", uuid, opts)
+    if raw is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"block not found: {uuid}"))
+
+    block = BlockEntity.model_validate(raw)
+    return json.dumps(block.model_dump(by_alias=False))
