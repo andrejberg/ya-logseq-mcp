@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-foundation-01-03-PLAN.md (human-verify approved)
-last_updated: "2026-03-09T21:44:09.999Z"
+stopped_at: Completed 02-core-reads-02-01-PLAN.md
+last_updated: "2026-03-09T22:01:27.687Z"
 last_activity: 2026-03-09 -- Phase 1 complete (human-verify approved)
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
   percent: 100
 ---
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100% (Phase 1 complete)
 | Phase 01-foundation P01 | 2min | 2 tasks | 7 files |
 | Phase 01-foundation P02 | 1min | 2 tasks | 2 files |
 | Phase 01-foundation P03 | 2min | 2 tasks | 5 files |
+| Phase 02-core-reads P01 | 3 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: Separate retry handling for TransportError vs 5xx vs 4xx (immediate fail) matches Logseq API semantics
 - [Phase 01-foundation]: Bottom-of-file tool module import in server.py avoids circular import since tools/core.py imports mcp from server
 - [Phase 01-foundation]: AppContext is a plain dataclass (not Pydantic) for internal server context — no validation overhead needed
+- [Phase 02-core-reads]: Import inside test body to allow collection of all 6 tests even when impl is missing
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:41:15.647Z
-Stopped at: Completed 01-foundation-01-03-PLAN.md (human-verify approved)
+Last session: 2026-03-09T22:01:27.685Z
+Stopped at: Completed 02-core-reads-02-01-PLAN.md
 Resume file: None

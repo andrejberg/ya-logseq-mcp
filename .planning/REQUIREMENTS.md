@@ -20,12 +20,12 @@ Requirements for initial release (graphthulhu swap threshold). 9 tools total.
 
 ### Core Reads
 
-- [ ] **READ-01**: `get_page` returns page metadata and block tree deduplicated by UUID
-- [ ] **READ-02**: `get_page` preserves correct parent/child nesting (no blocks promoted to wrong level)
-- [ ] **READ-03**: `get_page` uses page name (not UUID) for `getPageBlocksTree` calls
-- [ ] **READ-04**: `get_block` returns a single block by UUID with optional children
-- [ ] **READ-05**: `list_pages` returns pages with optional namespace filter
-- [ ] **READ-06**: `get_references` returns backlinks to a page via `getPageLinkedReferences`
+- [x] **READ-01**: `get_page` returns page metadata and block tree deduplicated by UUID
+- [x] **READ-02**: `get_page` preserves correct parent/child nesting (no blocks promoted to wrong level)
+- [x] **READ-03**: `get_page` uses page name (not UUID) for `getPageBlocksTree` calls
+- [x] **READ-04**: `get_block` returns a single block by UUID with optional children
+- [x] **READ-05**: `list_pages` returns pages with optional namespace filter
+- [x] **READ-06**: `get_references` returns backlinks to a page via `getPageLinkedReferences`
 
 ### Write Tools
 
@@ -107,12 +107,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-06 | Phase 1 | Complete |
 | FOUN-07 | Phase 1 | Complete |
 | FOUN-08 | Phase 1 | Complete |
-| READ-01 | Phase 2 | Pending |
-| READ-02 | Phase 2 | Pending |
-| READ-03 | Phase 2 | Pending |
-| READ-04 | Phase 2 | Pending |
-| READ-05 | Phase 2 | Pending |
-| READ-06 | Phase 2 | Pending |
+| READ-01 | Phase 2 | Complete |
+| READ-02 | Phase 2 | Complete |
+| READ-03 | Phase 2 | Complete |
+| READ-04 | Phase 2 | Complete |
+| READ-05 | Phase 2 | Complete |
+| READ-06 | Phase 2 | Complete |
 | WRIT-01 | Phase 3 | Pending |
 | WRIT-02 | Phase 3 | Pending |
 | WRIT-03 | Phase 3 | Pending |
