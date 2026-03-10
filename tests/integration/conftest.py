@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -22,6 +23,8 @@ SANDBOX_BASELINE_BLOCKS = [
     "This page is reserved for Phase 4 live mutation tests.",
 ]
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
+GRAPHTHULHU_CONFIG_ENV = "GRAPHTHULHU_MCP_CONFIG"
+GRAPHTHULHU_CONFIG_DEFAULT = Path.home() / ".claude" / ".mcp-graphthulhu.json"
 
 
 @dataclass(frozen=True)
@@ -45,6 +48,14 @@ class StdioServerHandle:
         return self.stderr_buffer.read()
 
 
+@dataclass(frozen=True)
+class ExternalMcpServerConfig:
+    command: str
+    args: list[str]
+    env: dict[str, str]
+    cwd: str | Path | None
+
+
 def _require_env(name: str) -> str:
     value = os.environ.get(name, "").strip()
     if not value:
@@ -53,6 +64,68 @@ def _require_env(name: str) -> str:
             "Open the isolated Logseq graph first, then export the required environment."
         )
     return value
+
+
+def _require_graphthulhu_config_path() -> Path:
+    configured = os.environ.get(GRAPHTHULHU_CONFIG_ENV, "").strip()
+    config_path = Path(configured).expanduser() if configured else GRAPHTHULHU_CONFIG_DEFAULT
+    if not configured:
+        pytest.fail(
+            f"{GRAPHTHULHU_CONFIG_ENV} is required for graphthulhu parity tests. "
+            f"Export {GRAPHTHULHU_CONFIG_ENV}={GRAPHTHULHU_CONFIG_DEFAULT} before running this selection."
+        )
+    if not config_path.is_file():
+        pytest.fail(
+            f"{GRAPHTHULHU_CONFIG_ENV} must point to the graphthulhu-only MCP config. "
+            f"Configured path does not exist: {config_path}"
+        )
+    return config_path
+
+
+def _load_external_mcp_server_config(config_path: Path) -> ExternalMcpServerConfig:
+    try:
+        raw = json.loads(config_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        pytest.fail(f"Failed to parse graphthulhu MCP config {config_path}: {exc}")
+
+    if not isinstance(raw, dict):
+        pytest.fail(f"Graphthulhu MCP config must be a JSON object: {config_path}")
+
+    config = raw
+    servers = raw.get("mcpServers")
+    if isinstance(servers, dict):
+        if len(servers) != 1:
+            pytest.fail(
+                "Graphthulhu parity tests require a graphthulhu-only MCP config with exactly one server entry. "
+                f"Found {len(servers)} entries in {config_path}"
+            )
+        config = next(iter(servers.values()))
+
+    if not isinstance(config, dict):
+        pytest.fail(f"Graphthulhu server config is invalid in {config_path}")
+
+    command = config.get("command")
+    args = config.get("args", [])
+    env = config.get("env", {})
+    cwd = config.get("cwd")
+
+    if not isinstance(command, str) or not command.strip():
+        pytest.fail(f"Graphthulhu config in {config_path} is missing a valid command")
+    if not isinstance(args, list) or not all(isinstance(arg, str) for arg in args):
+        pytest.fail(f"Graphthulhu config in {config_path} must define args as a string list")
+    if not isinstance(env, dict) or not all(
+        isinstance(key, str) and isinstance(value, str) for key, value in env.items()
+    ):
+        pytest.fail(f"Graphthulhu config in {config_path} must define env as a string map")
+    if cwd is not None and not isinstance(cwd, str):
+        pytest.fail(f"Graphthulhu config in {config_path} must define cwd as a string path")
+
+    return ExternalMcpServerConfig(
+        command=command,
+        args=args,
+        env=env,
+        cwd=Path(cwd).expanduser() if cwd else None,
+    )
 
 
 async def _get_graph_name(client: LogseqClient) -> str:
@@ -169,6 +242,20 @@ def _build_stdio_env(settings: IsolatedGraphEnv) -> dict[str, str]:
     return env
 
 
+def _build_external_stdio_env(
+    settings: IsolatedGraphEnv,
+    server_env: dict[str, str],
+) -> dict[str, str]:
+    env = _build_stdio_env(settings)
+    env.update(server_env)
+    env["LOGSEQ_API_URL"] = settings.api_url
+    env["LOGSEQ_API_TOKEN"] = settings.token
+    env["LOGSEQ_TEST_GRAPH_NAME"] = settings.graph_name
+    env["LOGSEQ_TEST_PARITY_PAGE"] = settings.parity_page
+    env["LOGSEQ_TEST_SANDBOX_PAGE"] = settings.sandbox_page
+    return env
+
+
 @pytest.fixture
 def isolated_graph_env() -> IsolatedGraphEnv:
     return IsolatedGraphEnv(
@@ -180,18 +267,10 @@ def isolated_graph_env() -> IsolatedGraphEnv:
     )
 
 
-def launch_stdio_server(
-    isolated_graph_env: IsolatedGraphEnv,
-) -> AsyncIterator[StdioServerHandle]:
+def _launch_stdio_server(server: StdioServerParameters) -> AsyncIterator[StdioServerHandle]:
     @asynccontextmanager
     async def _runner() -> AsyncIterator[StdioServerHandle]:
         stderr_buffer = TemporaryFile(mode="w+", encoding="utf-8")
-        server = StdioServerParameters(
-            command="uv",
-            args=["run", "python", "-m", "logseq_mcp"],
-            env=_build_stdio_env(isolated_graph_env),
-            cwd=Path(__file__).resolve().parents[2],
-        )
 
         try:
             async with stdio_client(server, errlog=stderr_buffer) as (read_stream, write_stream):
@@ -202,6 +281,31 @@ def launch_stdio_server(
             stderr_buffer.close()
 
     return _runner()
+
+
+def launch_stdio_server(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> AsyncIterator[StdioServerHandle]:
+    server = StdioServerParameters(
+        command="uv",
+        args=["run", "python", "-m", "logseq_mcp"],
+        env=_build_stdio_env(isolated_graph_env),
+        cwd=Path(__file__).resolve().parents[2],
+    )
+    return _launch_stdio_server(server)
+
+
+def launch_external_stdio_server(
+    isolated_graph_env: IsolatedGraphEnv,
+    external_config: ExternalMcpServerConfig,
+) -> AsyncIterator[StdioServerHandle]:
+    server = StdioServerParameters(
+        command=external_config.command,
+        args=external_config.args,
+        env=_build_external_stdio_env(isolated_graph_env, external_config.env),
+        cwd=external_config.cwd,
+    )
+    return _launch_stdio_server(server)
 
 
 @pytest_asyncio.fixture
@@ -226,6 +330,19 @@ def assert_isolated_graph(
 @pytest.fixture
 def mcp_session(isolated_graph_env: IsolatedGraphEnv) -> AsyncIterator[StdioServerHandle]:
     return launch_stdio_server(isolated_graph_env)
+
+
+@pytest.fixture
+def graphthulhu_mcp_config() -> ExternalMcpServerConfig:
+    return _load_external_mcp_server_config(_require_graphthulhu_config_path())
+
+
+@pytest.fixture
+def graphthulhu_mcp_session(
+    isolated_graph_env: IsolatedGraphEnv,
+    graphthulhu_mcp_config: ExternalMcpServerConfig,
+) -> AsyncIterator[StdioServerHandle]:
+    return launch_external_stdio_server(isolated_graph_env, graphthulhu_mcp_config)
 
 
 @pytest.fixture
