@@ -23,3 +23,4 @@ mcp = FastMCP("logseq-mcp", lifespan=lifespan)
 
 # Import tools so they register their decorators on `mcp`
 from logseq_mcp.tools import core as _core  # noqa: E402, F401
+from logseq_mcp.tools import write as _write  # noqa: E402, F401

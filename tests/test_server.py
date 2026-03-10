@@ -12,11 +12,13 @@ def token_env(monkeypatch):
 
 
 def test_tool_registered(token_env):
-    """health tool must be registered on the FastMCP instance."""
+    """Core and Phase 3 write tools must be registered on the FastMCP instance."""
     from logseq_mcp.server import mcp
     # FastMCP stores tools in _tool_manager; access via internal registry
     tool_names = list(mcp._tool_manager._tools.keys())
-    assert "health" in tool_names, f"health not in tools: {tool_names}"
+    expected = {"health", "page_create", "block_append", "block_update", "block_delete"}
+    missing = expected.difference(tool_names)
+    assert not missing, f"missing tools {sorted(missing)} from: {tool_names}"
 
 
 def test_stderr_only(token_env, capsys):
