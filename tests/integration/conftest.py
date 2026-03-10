@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryFile
 from typing import AsyncIterator, Awaitable, Callable
 
 import pytest
 import pytest_asyncio
+from mcp import ClientSession
+from mcp.client.stdio import StdioServerParameters, stdio_client
 
 from logseq_mcp.client import LogseqClient
 
@@ -27,6 +31,18 @@ class IsolatedGraphEnv:
     graph_name: str
     parity_page: str
     sandbox_page: str
+
+
+@dataclass
+class StdioServerHandle:
+    session: ClientSession
+    stderr_buffer: object
+
+    @property
+    def stderr_text(self) -> str:
+        self.stderr_buffer.flush()
+        self.stderr_buffer.seek(0)
+        return self.stderr_buffer.read()
 
 
 def _require_env(name: str) -> str:
@@ -143,6 +159,16 @@ async def _seed_fixture_graph(client: LogseqClient, settings: IsolatedGraphEnv) 
     return {"parity_page": settings.parity_page, "sandbox_page": settings.sandbox_page}
 
 
+def _build_stdio_env(settings: IsolatedGraphEnv) -> dict[str, str]:
+    env = os.environ.copy()
+    env["LOGSEQ_API_URL"] = settings.api_url
+    env["LOGSEQ_API_TOKEN"] = settings.token
+    env["LOGSEQ_TEST_GRAPH_NAME"] = settings.graph_name
+    env["LOGSEQ_TEST_PARITY_PAGE"] = settings.parity_page
+    env["LOGSEQ_TEST_SANDBOX_PAGE"] = settings.sandbox_page
+    return env
+
+
 @pytest.fixture
 def isolated_graph_env() -> IsolatedGraphEnv:
     return IsolatedGraphEnv(
@@ -152,6 +178,30 @@ def isolated_graph_env() -> IsolatedGraphEnv:
         parity_page=os.environ.get("LOGSEQ_TEST_PARITY_PAGE", PARITY_PAGE_NAME),
         sandbox_page=os.environ.get("LOGSEQ_TEST_SANDBOX_PAGE", SANDBOX_PAGE_NAME),
     )
+
+
+def launch_stdio_server(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> AsyncIterator[StdioServerHandle]:
+    @asynccontextmanager
+    async def _runner() -> AsyncIterator[StdioServerHandle]:
+        stderr_buffer = TemporaryFile(mode="w+", encoding="utf-8")
+        server = StdioServerParameters(
+            command="uv",
+            args=["run", "python", "-m", "logseq_mcp"],
+            env=_build_stdio_env(isolated_graph_env),
+            cwd=Path(__file__).resolve().parents[2],
+        )
+
+        try:
+            async with stdio_client(server, errlog=stderr_buffer) as (read_stream, write_stream):
+                async with ClientSession(read_stream, write_stream) as session:
+                    await session.initialize()
+                    yield StdioServerHandle(session=session, stderr_buffer=stderr_buffer)
+        finally:
+            stderr_buffer.close()
+
+    return _runner()
 
 
 @pytest_asyncio.fixture
@@ -174,6 +224,11 @@ def assert_isolated_graph(
 
 
 @pytest.fixture
+def mcp_session(isolated_graph_env: IsolatedGraphEnv) -> AsyncIterator[StdioServerHandle]:
+    return launch_stdio_server(isolated_graph_env)
+
+
+@pytest.fixture
 def seed_fixture_graph(
     isolated_graph_env: IsolatedGraphEnv,
 ) -> Callable[[LogseqClient], Awaitable[dict[str, str]]]:
@@ -181,3 +236,9 @@ def seed_fixture_graph(
         return await _seed_fixture_graph(client, isolated_graph_env)
 
     return _runner
+
+
+def assert_protocol_clean_stdout(stderr_text: str) -> None:
+    protocol_markers = ('"jsonrpc"', '"method"', '"result"', '"params"', '"id"')
+    if any(marker in stderr_text for marker in protocol_markers):
+        pytest.fail(f"stderr contains MCP protocol traffic: {stderr_text!r}")
