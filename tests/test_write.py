@@ -158,9 +158,14 @@ async def test_block_append_accepts_strings_and_nested_objects(token_env):
     assert append_calls[0][1][1] == "root 1"
     assert append_calls[1][1][1] == "root 2"
     assert append_calls[1][1][2]["properties"] == {"kind": "task"}
+    assert data["page"] == "Project Alpha"
+    assert data["appended"] == 3
+    assert data["block_count"] == 3
     insert_calls = [call for call in calls if call[0] == "logseq.Editor.insertBlock"]
     assert len(insert_calls) == 1
+    assert insert_calls[0][1][0] == "uuid-root-2"
     assert insert_calls[0][1][1] == "child"
+    assert insert_calls[0][1][2] == {"sibling": False}
     assert _flatten_block_values(data["blocks"], "content") == ["root 1", "root 2", "child"]
 
 
@@ -223,6 +228,10 @@ async def test_block_append_preserves_requested_hierarchy_and_order(token_env):
     ]
     assert calls[2][1][0] == "uuid-parent-a"
     assert calls[3][1][0] == "uuid-parent-a"
+    assert calls[2][1][2] == {"sibling": False}
+    assert calls[3][1][2] == {"sibling": False}
+    assert data["appended"] == 4
+    assert data["block_count"] == 4
     assert [block["content"] for block in data["blocks"]] == ["parent a", "parent b"]
     assert [child["content"] for child in data["blocks"][0]["children"]] == ["child a1", "child a2"]
 
