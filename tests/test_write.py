@@ -276,10 +276,25 @@ async def test_block_delete_removes_block_from_followup_reads(token_env):
         calls.append((method, args))
         if method == "logseq.Editor.getBlock":
             if len(calls) == 1:
-                return {"id": 9, "uuid": "block-uuid", "content": "to delete", "children": []}
+                return {
+                    "id": 9,
+                    "uuid": "block-uuid",
+                    "content": "to delete",
+                    "page": {"id": 2, "uuid": "page-uuid", "name": "Project Alpha"},
+                    "children": [],
+                }
             return None
         if method == "logseq.Editor.removeBlock":
             return True
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {
+                    "id": 11,
+                    "uuid": "sibling-uuid",
+                    "content": "sibling block",
+                    "children": [],
+                }
+            ]
         return None
 
     client = AsyncMock()
@@ -293,8 +308,27 @@ async def test_block_delete_removes_block_from_followup_reads(token_env):
         "logseq.Editor.getBlock",
         "logseq.Editor.removeBlock",
         "logseq.Editor.getBlock",
+        "logseq.Editor.getPageBlocksTree",
     ]
     assert data == {"ok": True, "uuid": "block-uuid"}
+
+
+async def test_block_update_unchanged_readback_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import block_update
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            return {"id": 9, "uuid": "block-uuid", "content": "old content", "children": []}
+        if method == "logseq.Editor.updateBlock":
+            return {"uuid": "block-uuid"}
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="updated content did not match"):
+        await block_update(mock_ctx, uuid="block-uuid", content="new content")
 
 
 async def test_invalid_nested_payload_fails_before_first_write(token_env):
