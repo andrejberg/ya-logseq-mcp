@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 4
 current_phase_name: integration and swap
-current_plan: 2
+current_plan: 3
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-10T08:42:05.387Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-10T09:12:35.864Z"
 last_activity: 2026-03-10
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -24,26 +24,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 4 Plan 01 complete; Phase 4 Plan 02 is next
+**Current focus:** Phase 4 Plan 02 complete; Phase 4 Plan 03 is next
 
 ## Current Position
 
 **Current Phase:** 4
 **Current Phase Name:** integration and swap
 **Total Phases:** 4
-**Current Plan:** 2
+**Current Plan:** 3
 **Total Plans in Phase:** 3
-**Status:** Executing
+**Status:** Ready to execute
 **Last Activity:** 2026-03-10
 
-Progress: [████████░░] 83%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 4min
-- Total execution time: 38min
+- Total plans completed: 11
+- Average duration: 6min
+- Total execution time: 64min
 
 **By Phase:**
 
@@ -52,11 +52,11 @@ Progress: [████████░░] 83%
 | Phase 1 | 3 | 5min | 2min |
 | Phase 2 | 3 | 10min | 3min |
 | Phase 3 | 2 | 13min | 7min |
-| Phase 4 | 1 | 10min | 10min |
+| Phase 4 | 2 | 36min | 18min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 5min, 6min, 7min, 10min
-- Trend: Stable
+- Last 5 plans: 5min, 6min, 7min, 10min, 26min
+- Trend: Increasing
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 2min | 2 tasks | 7 files |
@@ -69,6 +69,7 @@ Progress: [████████░░] 83%
 | Phase 03-write-tools P02 | 7min | 2 tasks | 2 files |
 | Phase 03-write-tools P03 | 2min | 2 tasks | 4 files |
 | Phase 04-integration-and-swap P01 | 10min | 2 tasks | 8 files |
+| Phase 04-integration-and-swap P02 | 26min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 04-integration-and-swap]: Phase 4 live tests stay behind pytest's integration marker and require source ~/Workspace/.env plus the isolated logseq-test-graph.
 - [Phase 04-integration-and-swap]: The harness resets only Phase 04 Write Sandbox before destructive checks and leaves the parity page read-only.
 - [Phase 04-integration-and-swap]: Live write success is determined by follow-up readback because Logseq returns null from updateBlock and removeBlock even when the mutation succeeds.
+- [Phase 04-integration-and-swap]: MCP tool assertions parse the real structuredContent.result wrapper emitted by FastMCP rather than assuming raw JSON text only.
+- [Phase 04-integration-and-swap]: Live graph safety stays enforced by reusing Plan 01 fixture seeding before any MCP write call instead of inventing a second isolation contract.
+- [Phase 04-integration-and-swap]: The stdio harness launches uv run python -m logseq_mcp directly so transport coverage matches the production Claude entrypoint.
 
 ### Pending Todos
 
@@ -115,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T08:42:05.385Z
-**Stopped At:** Completed 04-01-PLAN.md
+Last session: 2026-03-10T09:12:10.999Z
+**Stopped At:** Completed 04-02-PLAN.md
 **Resume File:** None

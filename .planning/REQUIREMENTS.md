@@ -37,7 +37,7 @@ Requirements for initial release (graphthulhu swap threshold). 9 tools total.
 
 ### Integration
 
-- [ ] **INTG-01**: Server runs as MCP stdio transport via `python -m logseq_mcp`
+- [x] **INTG-01**: Server runs as MCP stdio transport via `python -m logseq_mcp`
 - [x] **INTG-02**: Integration tests run against a local test Logseq graph (isolated from real graph)
 - [ ] **INTG-03**: Parity verified on `get_page` output vs graphthulhu (same page, fewer/correct blocks)
 
@@ -118,7 +118,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WRIT-03 | Phase 3 | Complete |
 | WRIT-04 | Phase 3 | Complete |
 | WRIT-05 | Phase 3 | Complete |
-| INTG-01 | Phase 4 | Pending |
+| INTG-01 | Phase 4 | Complete |
 | INTG-02 | Phase 4 | Complete |
 | INTG-03 | Phase 4 | Pending |
 
