@@ -62,11 +62,12 @@ Plans:
   2. `block_append` with nested objects produces correct parent/child block hierarchy in Logseq
   3. `block_update` changes block content and the change is visible via `get_page`
   4. `block_delete` removes a block and it no longer appears in `get_page` results
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [x] 03-01-PLAN.md — test_write.py red-state scaffold for WRIT-01 through WRIT-05 (Wave 1)
+- [ ] 03-02-PLAN.md — write.py normalization, page_create, and block_append (Wave 2)
+- [ ] 03-03-PLAN.md — block_update, block_delete, and write-module registration (Wave 3)
 
 ### Phase 4: Integration and Swap
 **Goal**: The server is production-ready and replaces graphthulhu in the MCP config
@@ -91,5 +92,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
 | 2. Core Reads | 3/3 | Complete | 2026-03-09 |
-| 3. Write Tools | 0/? | Not started | - |
+| 3. Write Tools | 1/3 | In Progress|  |
 | 4. Integration and Swap | 0/? | Not started | - |
