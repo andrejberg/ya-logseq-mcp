@@ -284,10 +284,7 @@ async def block_update(ctx: Context, uuid: str, content: str) -> str:
 
     await _get_block_or_error(client, uuid)
 
-    updated = await client._call("logseq.Editor.updateBlock", uuid, content)
-    if updated is None:
-        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"failed to update block: {uuid}"))
-    _extract_uuid(updated, "logseq.Editor.updateBlock")
+    await client._call("logseq.Editor.updateBlock", uuid, content)
 
     block = await _verify_block_readback(client, uuid, content)
     return json.dumps({"uuid": block.uuid, "content": block.content})
@@ -303,9 +300,6 @@ async def block_delete(ctx: Context, uuid: str) -> str:
     block = await _get_block_or_error(client, uuid)
     page_name = block.page.name if block.page and block.page.name else None
 
-    deleted = await client._call("logseq.Editor.removeBlock", uuid)
-    if deleted is None:
-        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"failed to delete block: {uuid}"))
-
+    await client._call("logseq.Editor.removeBlock", uuid)
     await _verify_block_absent(client, uuid, page_name)
     return json.dumps({"ok": True, "uuid": uuid})

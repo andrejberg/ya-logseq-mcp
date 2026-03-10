@@ -267,6 +267,36 @@ async def test_block_update_changes_content_and_verifies_readback(token_env):
     assert data["content"] == "new content"
 
 
+async def test_block_update_tolerates_null_rpc_response_when_readback_matches(token_env):
+    from logseq_mcp.tools.write import block_update
+
+    calls = []
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getBlock":
+            if len(calls) == 1:
+                return {"id": 9, "uuid": "block-uuid", "content": "old content", "children": []}
+            return {"id": 9, "uuid": "block-uuid", "content": "new content", "children": []}
+        if method == "logseq.Editor.updateBlock":
+            return None
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await block_update(mock_ctx, uuid="block-uuid", content="new content")
+    data = json.loads(result)
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getBlock",
+        "logseq.Editor.updateBlock",
+        "logseq.Editor.getBlock",
+    ]
+    assert data == {"uuid": "block-uuid", "content": "new content"}
+
+
 async def test_block_delete_removes_block_from_followup_reads(token_env):
     from logseq_mcp.tools.write import block_delete
 
@@ -295,6 +325,45 @@ async def test_block_delete_removes_block_from_followup_reads(token_env):
                     "children": [],
                 }
             ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await block_delete(mock_ctx, uuid="block-uuid")
+    data = json.loads(result)
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getBlock",
+        "logseq.Editor.removeBlock",
+        "logseq.Editor.getBlock",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert data == {"ok": True, "uuid": "block-uuid"}
+
+
+async def test_block_delete_tolerates_null_rpc_response_when_block_disappears(token_env):
+    from logseq_mcp.tools.write import block_delete
+
+    calls = []
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getBlock":
+            if len(calls) == 1:
+                return {
+                    "id": 9,
+                    "uuid": "block-uuid",
+                    "content": "to delete",
+                    "page": {"id": 2, "uuid": "page-uuid", "name": "Project Alpha"},
+                    "children": [],
+                }
+            return None
+        if method == "logseq.Editor.removeBlock":
+            return None
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
         return None
 
     client = AsyncMock()
