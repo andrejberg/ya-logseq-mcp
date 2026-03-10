@@ -66,6 +66,13 @@ def _parse_block_tree(raw_blocks: list) -> list[BlockEntity]:
     return parsed
 
 
+def _contains_block_uuid(blocks: list[BlockEntity], uuid: str) -> bool:
+    for block in blocks:
+        if block.uuid == uuid or _contains_block_uuid(block.children, uuid):
+            return True
+    return False
+
+
 def _normalize_blocks(blocks: None | str | dict | list) -> list[WriteBlockInput]:
     if blocks is None:
         return []
@@ -154,6 +161,41 @@ async def _get_page_blocks(client, page_name: str) -> list[BlockEntity]:
     return _parse_block_tree(raw)
 
 
+async def _get_block_or_error(client, uuid: str) -> BlockEntity:
+    raw = await client._call("logseq.Editor.getBlock", uuid, {"includeChildren": True})
+    if raw is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"block not found: {uuid}"))
+
+    try:
+        return BlockEntity.model_validate(raw)
+    except ValidationError as exc:
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message=f"logseq.Editor.getBlock returned an invalid response: {exc}")
+        ) from exc
+
+
+async def _verify_block_readback(client, uuid: str, expected_content: str) -> BlockEntity:
+    block = await _get_block_or_error(client, uuid)
+    if block.content != expected_content:
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message=f"updated content did not match readback for block: {uuid}")
+        )
+    return block
+
+
+async def _verify_block_absent(client, uuid: str, page_name: str | None = None) -> None:
+    raw = await client._call("logseq.Editor.getBlock", uuid, {"includeChildren": True})
+    if raw is not None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"block still exists after delete: {uuid}"))
+
+    if page_name:
+        block_tree = await _get_page_blocks(client, page_name)
+        if _contains_block_uuid(block_tree, uuid):
+            raise McpError(
+                ErrorData(code=INTERNAL_ERROR, message=f"block still present in page tree after delete: {uuid}")
+            )
+
+
 def _normalize_error(exc: Exception) -> McpError:
     if isinstance(exc, McpError):
         return exc
@@ -235,9 +277,35 @@ async def block_append(ctx: Context, page: str, blocks: list | str | dict) -> st
 
 @mcp.tool()
 async def block_update(ctx: Context, uuid: str, content: str) -> str:
-    raise NotImplementedError("block_update is not implemented yet")
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("block_update: %s", uuid)
+
+    await _get_block_or_error(client, uuid)
+
+    updated = await client._call("logseq.Editor.updateBlock", uuid, content)
+    if updated is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"failed to update block: {uuid}"))
+    _extract_uuid(updated, "logseq.Editor.updateBlock")
+
+    block = await _verify_block_readback(client, uuid, content)
+    return json.dumps({"uuid": block.uuid, "content": block.content})
 
 
 @mcp.tool()
 async def block_delete(ctx: Context, uuid: str) -> str:
-    raise NotImplementedError("block_delete is not implemented yet")
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("block_delete: %s", uuid)
+
+    block = await _get_block_or_error(client, uuid)
+    page_name = block.page.name if block.page and block.page.name else None
+
+    deleted = await client._call("logseq.Editor.removeBlock", uuid)
+    if deleted is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"failed to delete block: {uuid}"))
+
+    await _verify_block_absent(client, uuid, page_name)
+    return json.dumps({"ok": True, "uuid": uuid})
