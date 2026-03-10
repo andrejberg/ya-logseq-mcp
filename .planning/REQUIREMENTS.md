@@ -32,8 +32,8 @@ Requirements for initial release (graphthulhu swap threshold). 9 tools total.
 - [x] **WRIT-01**: `page_create` creates a page with properties and optional initial blocks
 - [x] **WRIT-02**: `block_append` appends blocks to a page, accepting both flat strings and nested `{content, properties, children}` objects
 - [x] **WRIT-03**: `block_append` produces correct Logseq block hierarchy (children nested under parents)
-- [ ] **WRIT-04**: `block_update` updates block content by UUID
-- [ ] **WRIT-05**: `block_delete` deletes a block by UUID
+- [x] **WRIT-04**: `block_update` updates block content by UUID
+- [x] **WRIT-05**: `block_delete` deletes a block by UUID
 
 ### Integration
 
@@ -116,8 +116,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WRIT-01 | Phase 3 | Complete |
 | WRIT-02 | Phase 3 | Complete |
 | WRIT-03 | Phase 3 | Complete |
-| WRIT-04 | Phase 3 | Pending |
-| WRIT-05 | Phase 3 | Pending |
+| WRIT-04 | Phase 3 | Complete |
+| WRIT-05 | Phase 3 | Complete |
 | INTG-01 | Phase 4 | Pending |
 | INTG-02 | Phase 4 | Pending |
 | INTG-03 | Phase 4 | Pending |
