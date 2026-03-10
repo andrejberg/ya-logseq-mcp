@@ -4,17 +4,17 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 4
 current_phase_name: integration and swap
-current_plan: Not started
-status: planning
-stopped_at: Completed 03-write-tools-03-03-PLAN.md
-last_updated: "2026-03-10T07:30:18.919Z"
+current_plan: 2
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-10T08:42:05.387Z"
 last_activity: 2026-03-10
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_plans: 12
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State
@@ -24,26 +24,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 3 complete; Phase 4: Integration and Swap is next
+**Current focus:** Phase 4 Plan 01 complete; Phase 4 Plan 02 is next
 
 ## Current Position
 
 **Current Phase:** 4
 **Current Phase Name:** integration and swap
 **Total Phases:** 4
-**Current Plan:** Not started
+**Current Plan:** 2
 **Total Plans in Phase:** 3
-**Status:** Ready to plan
+**Status:** Executing
 **Last Activity:** 2026-03-10
 
-Progress: [██████████] 100%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 10
 - Average duration: 4min
-- Total execution time: 28min
+- Total execution time: 38min
 
 **By Phase:**
 
@@ -52,9 +52,10 @@ Progress: [██████████] 100%
 | Phase 1 | 3 | 5min | 2min |
 | Phase 2 | 3 | 10min | 3min |
 | Phase 3 | 2 | 13min | 7min |
+| Phase 4 | 1 | 10min | 10min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 5min, 6min, 7min
+- Last 5 plans: 3min, 5min, 6min, 7min, 10min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -67,6 +68,7 @@ Progress: [██████████] 100%
 | Phase 03-write-tools P01 | 6min | 1 tasks | 2 files |
 | Phase 03-write-tools P02 | 7min | 2 tasks | 2 files |
 | Phase 03-write-tools P03 | 2min | 2 tasks | 4 files |
+| Phase 04-integration-and-swap P01 | 10min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -99,6 +101,9 @@ Recent decisions affecting current work:
 - [Phase 03-write-tools]: Kept block_update verification on getBlock(..., includeChildren=True) so WRIT-04 uses the same Phase 2 block shape as the read tools.
 - [Phase 03-write-tools]: Used the deleted block's preflight page context to confirm page-tree absence after removeBlock when Logseq returns page metadata.
 - [Phase 03-write-tools]: Extended the server registry test to assert all four Phase 3 write tools are exposed once the write module is imported.
+- [Phase 04-integration-and-swap]: Phase 4 live tests stay behind pytest's integration marker and require source ~/Workspace/.env plus the isolated logseq-test-graph.
+- [Phase 04-integration-and-swap]: The harness resets only Phase 04 Write Sandbox before destructive checks and leaves the parity page read-only.
+- [Phase 04-integration-and-swap]: Live write success is determined by follow-up readback because Logseq returns null from updateBlock and removeBlock even when the mutation succeeds.
 
 ### Pending Todos
 
@@ -110,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T07:26:30.904Z
-**Stopped At:** Completed 03-write-tools-03-03-PLAN.md
+Last session: 2026-03-10T08:42:05.385Z
+**Stopped At:** Completed 04-01-PLAN.md
 **Resume File:** None

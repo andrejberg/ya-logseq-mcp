@@ -78,10 +78,12 @@ Plans:
   2. Integration tests pass against an isolated test graph (not the real workspace graph)
   3. `get_page` on a known page returns fewer blocks than graphthulhu (deduplication verified)
   4. The server entry in `~/.claude/.mcp.json` replaces graphthulhu and daily workflow is unbroken
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [x] 04-01-PLAN.md — isolated test graph fixtures, safety guards, and live sandbox verification (Wave 1)
+- [ ] 04-02-PLAN.md — black-box MCP stdio subprocess verification and tool round trips (Wave 2)
+- [ ] 04-03-PLAN.md — graphthulhu parity, Claude swap gate, and rollback-ready sign-off (Wave 3)
 
 ## Progress
 
@@ -93,4 +95,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
 | 2. Core Reads | 3/3 | Complete | 2026-03-09 |
 | 3. Write Tools | 3/3 | Complete | 2026-03-10 |
-| 4. Integration and Swap | 0/? | Not started | - |
+| 4. Integration and Swap | 1/3 | In Progress | - |
