@@ -66,7 +66,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — test_write.py red-state scaffold for WRIT-01 through WRIT-05 (Wave 1)
-- [ ] 03-02-PLAN.md — write.py normalization, page_create, and block_append (Wave 2)
+- [x] 03-02-PLAN.md — write.py normalization, page_create, and block_append (Wave 2)
 - [ ] 03-03-PLAN.md — block_update, block_delete, and write-module registration (Wave 3)
 
 ### Phase 4: Integration and Swap
@@ -92,5 +92,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
 | 2. Core Reads | 3/3 | Complete | 2026-03-09 |
-| 3. Write Tools | 1/3 | In Progress|  |
+| 3. Write Tools | 2/3 | In Progress|  |
 | 4. Integration and Swap | 0/? | Not started | - |
