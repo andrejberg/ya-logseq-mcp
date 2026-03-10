@@ -24,7 +24,7 @@ SANDBOX_BASELINE_BLOCKS = [
 ]
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
 GRAPHTHULHU_CONFIG_ENV = "GRAPHTHULHU_MCP_CONFIG"
-GRAPHTHULHU_CONFIG_DEFAULT = Path.home() / ".claude" / ".mcp-graphthulhu.json"
+GRAPHTHULHU_CONFIG_REQUIRED = (Path.home() / ".claude" / ".mcp-graphthulhu.json").resolve()
 
 
 @dataclass(frozen=True)
@@ -68,11 +68,16 @@ def _require_env(name: str) -> str:
 
 def _require_graphthulhu_config_path() -> Path:
     configured = os.environ.get(GRAPHTHULHU_CONFIG_ENV, "").strip()
-    config_path = Path(configured).expanduser() if configured else GRAPHTHULHU_CONFIG_DEFAULT
     if not configured:
         pytest.fail(
             f"{GRAPHTHULHU_CONFIG_ENV} is required for graphthulhu parity tests. "
-            f"Export {GRAPHTHULHU_CONFIG_ENV}={GRAPHTHULHU_CONFIG_DEFAULT} before running this selection."
+            f"Export {GRAPHTHULHU_CONFIG_ENV}={GRAPHTHULHU_CONFIG_REQUIRED} before running this selection."
+        )
+    config_path = Path(configured).expanduser().resolve()
+    if config_path != GRAPHTHULHU_CONFIG_REQUIRED:
+        pytest.fail(
+            f"{GRAPHTHULHU_CONFIG_ENV} must point to {GRAPHTHULHU_CONFIG_REQUIRED} for the canonical parity run. "
+            f"Configured path: {config_path}"
         )
     if not config_path.is_file():
         pytest.fail(

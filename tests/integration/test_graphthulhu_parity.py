@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from dataclasses import dataclass
 
 import pytest
 
@@ -29,6 +30,21 @@ EXPECTED_PARITY_TREE = [
         ],
     ),
 ]
+
+
+
+@dataclass(frozen=True)
+class NormalizedParityPage:
+    name: str
+    blocks: list[dict]
+    block_count: int
+    top_level_order: list[tuple[str | None, str | None]]
+    uuid_counter: Counter[str]
+    duplicate_map: dict[str, int]
+
+    @property
+    def duplicate_excess(self) -> int:
+        return sum(count - 1 for count in self.duplicate_map.values())
 
 
 def _tool_payload(result):
@@ -71,12 +87,16 @@ def _duplicate_uuids(blocks: list[dict]) -> dict[str, int]:
     return {uuid: count for uuid, count in counts.items() if count > 1}
 
 
-def _duplicate_excess(blocks: list[dict]) -> int:
-    return sum(count - 1 for count in _duplicate_uuids(blocks).values())
-
-
 def _recursive_block_count(blocks: list[dict]) -> int:
     return sum(1 + _recursive_block_count(_block_children(block)) for block in blocks if isinstance(block, dict))
+
+
+def _extract_block_count(payload: dict, blocks: list[dict]) -> int:
+    for key in ("block_count", "blockCount"):
+        value = payload.get(key)
+        if isinstance(value, int):
+            return value
+    return _recursive_block_count(blocks)
 
 
 def _content_tree(blocks: list[dict]):
@@ -113,6 +133,36 @@ def _top_level_order(blocks: list[dict]):
     ]
 
 
+def _normalize_parity_page(payload: dict, fixture_name: str) -> NormalizedParityPage:
+    page = payload.get("page")
+    if not isinstance(page, dict):
+        pytest.fail("get_page payload missing page metadata")
+
+    page_name = page.get("name")
+    if not isinstance(page_name, str):
+        pytest.fail("get_page payload missing a string page name")
+    if page_name.lower() != fixture_name.lower():
+        pytest.fail(f"Expected parity fixture name '{fixture_name}', got '{page_name}'")
+
+    raw_blocks = payload.get("blocks")
+    if not isinstance(raw_blocks, list):
+        pytest.fail("get_page payload returned invalid blocks")
+
+    normalized_blocks = _strip_fixture_title_block(raw_blocks, fixture_name)
+    block_count = _extract_block_count(payload, normalized_blocks)
+    uuid_counter = _uuid_counter(normalized_blocks)
+    duplicate_map = _duplicate_uuids(normalized_blocks)
+
+    return NormalizedParityPage(
+        name=page_name,
+        blocks=normalized_blocks,
+        block_count=block_count,
+        top_level_order=_top_level_order(normalized_blocks),
+        uuid_counter=uuid_counter,
+        duplicate_map=duplicate_map,
+    )
+
+
 async def test_get_page_parity_fixture_has_fewer_duplicate_blocks_than_graphthulhu(
     mcp_session,
     graphthulhu_mcp_session,
@@ -126,33 +176,19 @@ async def test_get_page_parity_fixture_has_fewer_duplicate_blocks_than_graphthul
             await graphthulhu_handle.session.call_tool("get_page", {"name": isolated_graph_env.parity_page})
         )
 
-    logseq_blocks = logseq_payload["blocks"]
-    graphthulhu_blocks = graphthulhu_payload["blocks"]
+    logseq_page = _normalize_parity_page(logseq_payload, isolated_graph_env.parity_page)
+    graphthulhu_page = _normalize_parity_page(graphthulhu_payload, isolated_graph_env.parity_page)
 
-    assert logseq_payload["page"]["name"].lower() == isolated_graph_env.parity_page.lower()
-    assert graphthulhu_payload["page"]["name"].lower() == isolated_graph_env.parity_page.lower()
-    assert logseq_payload["page"]["name"].lower() == graphthulhu_payload["page"]["name"].lower()
-    assert _top_level_order(logseq_blocks) == _top_level_order(graphthulhu_blocks)
+    assert logseq_page.name.lower() == graphthulhu_page.name.lower()
+    assert logseq_page.top_level_order == graphthulhu_page.top_level_order
+    assert logseq_page.duplicate_map == {}, f"logseq-mcp returned duplicate UUIDs: {logseq_page.duplicate_map}"
+    assert set(logseq_page.uuid_counter) == set(graphthulhu_page.uuid_counter)
+    assert logseq_page.block_count <= graphthulhu_page.block_count
 
-    logseq_duplicates = _duplicate_uuids(logseq_blocks)
-    graphthulhu_duplicates = _duplicate_uuids(graphthulhu_blocks)
-
-    assert logseq_duplicates == {}, f"logseq-mcp returned duplicate UUIDs: {logseq_duplicates}"
-    assert _recursive_block_count(logseq_blocks) == logseq_payload["block_count"]
-    assert _recursive_block_count(graphthulhu_blocks) == graphthulhu_payload["blockCount"]
-
-    logseq_uuid_set = set(_uuid_counter(logseq_blocks))
-    graphthulhu_uuid_set = set(_uuid_counter(graphthulhu_blocks))
-    assert logseq_uuid_set == graphthulhu_uuid_set
-
-    logseq_count = logseq_payload["block_count"]
-    graphthulhu_count = graphthulhu_payload["blockCount"]
-    assert logseq_count <= graphthulhu_count
-
-    if graphthulhu_count > logseq_count:
-        excess = graphthulhu_count - logseq_count
-        assert graphthulhu_duplicates, "graphthulhu block excess must be explainable as duplicate UUIDs"
-        assert excess == _duplicate_excess(graphthulhu_blocks)
+    if graphthulhu_page.block_count > logseq_page.block_count:
+        block_excess = graphthulhu_page.block_count - logseq_page.block_count
+        assert graphthulhu_page.duplicate_map, "graphthulhu block excess must be explainable as duplicate UUIDs"
+        assert block_excess == graphthulhu_page.duplicate_excess
 
 
 async def test_logseq_mcp_preserves_expected_child_nesting_on_parity_fixture(
@@ -164,7 +200,5 @@ async def test_logseq_mcp_preserves_expected_child_nesting_on_parity_fixture(
             await handle.session.call_tool("get_page", {"name": isolated_graph_env.parity_page})
         )
 
-    assert logseq_payload["page"]["name"].lower() == isolated_graph_env.parity_page.lower()
-    assert _content_tree(
-        _strip_fixture_title_block(logseq_payload["blocks"], isolated_graph_env.parity_page)
-    ) == EXPECTED_PARITY_TREE
+    logseq_page = _normalize_parity_page(logseq_payload, isolated_graph_env.parity_page)
+    assert _content_tree(logseq_page.blocks) == EXPECTED_PARITY_TREE
