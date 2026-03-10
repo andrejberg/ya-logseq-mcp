@@ -1,0 +1,183 @@
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import AsyncIterator, Awaitable, Callable
+
+import pytest
+import pytest_asyncio
+
+from logseq_mcp.client import LogseqClient
+
+REQUIRED_GRAPH_NAME = "logseq-test-graph"
+PARITY_PAGE_NAME = "Phase 04 Parity Fixture"
+SANDBOX_PAGE_NAME = "Phase 04 Write Sandbox"
+SANDBOX_BASELINE_BLOCKS = [
+    "Sandbox baseline",
+    "This page is reserved for Phase 4 live mutation tests.",
+]
+FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
+
+
+@dataclass(frozen=True)
+class IsolatedGraphEnv:
+    api_url: str
+    token: str
+    graph_name: str
+    parity_page: str
+    sandbox_page: str
+
+
+def _require_env(name: str) -> str:
+    value = os.environ.get(name, "").strip()
+    if not value:
+        pytest.fail(
+            f"{name} is required for live integration tests. "
+            "Open the isolated Logseq graph first, then export the required environment."
+        )
+    return value
+
+
+async def _get_graph_name(client: LogseqClient) -> str:
+    graph = await client._call("logseq.App.getCurrentGraph")
+    if not isinstance(graph, dict):
+        pytest.fail("logseq.App.getCurrentGraph returned an invalid payload")
+
+    graph_name = graph.get("name")
+    if not isinstance(graph_name, str) or not graph_name.strip():
+        pytest.fail("Logseq did not report an active graph name")
+
+    return graph_name
+
+
+async def _assert_isolated_graph(client: LogseqClient, settings: IsolatedGraphEnv) -> str:
+    graph_name = await _get_graph_name(client)
+    if graph_name != settings.graph_name:
+        pytest.fail(
+            "Live integration tests are locked to the isolated graph. "
+            f"Expected '{settings.graph_name}', got '{graph_name}'. "
+            "Switch Logseq to the disposable test graph before running any integration selection."
+        )
+    return graph_name
+
+
+async def _get_page_or_none(client: LogseqClient, page_name: str) -> dict | None:
+    page = await client._call("logseq.Editor.getPage", page_name)
+    if page is None:
+        return None
+    if not isinstance(page, dict):
+        pytest.fail(f"logseq.Editor.getPage returned an invalid payload for '{page_name}'")
+    return page
+
+
+async def _ensure_page(client: LogseqClient, page_name: str) -> None:
+    page = await _get_page_or_none(client, page_name)
+    if page is not None:
+        return
+
+    created = await client._call(
+        "logseq.Editor.createPage",
+        page_name,
+        {},
+        {"createFirstBlock": False},
+    )
+    if not isinstance(created, dict):
+        pytest.fail(f"Failed to create sandbox page '{page_name}'")
+
+
+async def _get_page_blocks(client: LogseqClient, page_name: str) -> list[dict]:
+    raw_blocks = await client._call("logseq.Editor.getPageBlocksTree", page_name)
+    if not isinstance(raw_blocks, list):
+        pytest.fail(f"logseq.Editor.getPageBlocksTree returned an invalid payload for '{page_name}'")
+    return raw_blocks
+
+
+def find_block_by_content(blocks: list[dict], content: str) -> dict | None:
+    for block in blocks:
+        if block.get("content") == content:
+            return block
+
+        children = block.get("children", [])
+        if isinstance(children, list):
+            match = find_block_by_content(children, content)
+            if match is not None:
+                return match
+
+    return None
+
+
+async def _reset_page_blocks(client: LogseqClient, page_name: str) -> None:
+    for block in await _get_page_blocks(client, page_name):
+        block_uuid = block.get("uuid")
+        if not isinstance(block_uuid, str) or not block_uuid:
+            pytest.fail(f"Top-level block on '{page_name}' is missing a uuid")
+        await client._call("logseq.Editor.removeBlock", block_uuid)
+
+
+async def _append_baseline_blocks(client: LogseqClient, page_name: str) -> None:
+    for content in SANDBOX_BASELINE_BLOCKS:
+        created = await client._call(
+            "logseq.Editor.appendBlockInPage",
+            page_name,
+            content,
+            {},
+        )
+        if not isinstance(created, dict) or not isinstance(created.get("uuid"), str):
+            pytest.fail(f"Failed to seed sandbox block '{content}' on '{page_name}'")
+
+
+async def _seed_fixture_graph(client: LogseqClient, settings: IsolatedGraphEnv) -> dict[str, str]:
+    await _assert_isolated_graph(client, settings)
+
+    if await _get_page_or_none(client, settings.parity_page) is None:
+        pytest.fail(
+            f"Required parity fixture page '{settings.parity_page}' is missing. "
+            f"Copy the markdown fixtures from {FIXTURE_ROOT} into the isolated graph before running writes."
+        )
+
+    await _ensure_page(client, settings.sandbox_page)
+    await _reset_page_blocks(client, settings.sandbox_page)
+    await _append_baseline_blocks(client, settings.sandbox_page)
+
+    return {"parity_page": settings.parity_page, "sandbox_page": settings.sandbox_page}
+
+
+@pytest.fixture
+def isolated_graph_env() -> IsolatedGraphEnv:
+    return IsolatedGraphEnv(
+        api_url=os.environ.get("LOGSEQ_API_URL", "http://127.0.0.1:12315"),
+        token=_require_env("LOGSEQ_API_TOKEN"),
+        graph_name=os.environ.get("LOGSEQ_TEST_GRAPH_NAME", REQUIRED_GRAPH_NAME),
+        parity_page=os.environ.get("LOGSEQ_TEST_PARITY_PAGE", PARITY_PAGE_NAME),
+        sandbox_page=os.environ.get("LOGSEQ_TEST_SANDBOX_PAGE", SANDBOX_PAGE_NAME),
+    )
+
+
+@pytest_asyncio.fixture
+async def live_client(monkeypatch: pytest.MonkeyPatch, isolated_graph_env: IsolatedGraphEnv) -> AsyncIterator[LogseqClient]:
+    monkeypatch.setenv("LOGSEQ_API_URL", isolated_graph_env.api_url)
+    monkeypatch.setenv("LOGSEQ_API_TOKEN", isolated_graph_env.token)
+
+    async with LogseqClient() as client:
+        yield client
+
+
+@pytest.fixture
+def assert_isolated_graph(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient], Awaitable[str]]:
+    async def _runner(client: LogseqClient) -> str:
+        return await _assert_isolated_graph(client, isolated_graph_env)
+
+    return _runner
+
+
+@pytest.fixture
+def seed_fixture_graph(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient], Awaitable[dict[str, str]]]:
+    async def _runner(client: LogseqClient) -> dict[str, str]:
+        return await _seed_fixture_graph(client, isolated_graph_env)
+
+    return _runner

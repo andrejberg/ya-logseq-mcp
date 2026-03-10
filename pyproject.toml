@@ -28,3 +28,6 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+markers = [
+    "integration: exercises a live Logseq instance against the isolated test graph",
+]
