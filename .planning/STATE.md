@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: journals and lifecycle tools
-current_phase: null
-current_phase_name: not started
+current_phase: 5
+current_phase_name: lifecycle write semantics
 current_plan: null
-status: defining requirements
-stopped_at: Started v1.1 milestone definition and enabled research
-last_updated: "2026-03-12T13:30:00Z"
+status: roadmap defined
+stopped_at: Drafted v1.1 roadmap starting at Phase 5
+last_updated: "2026-03-12T14:00:00Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 0
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** v1.1 journals and lifecycle tools requirements and roadmap
+**Current focus:** v1.1 roadmap approved and ready for Phase 5 planning
 
 ## Current Position
 
-**Current Phase:** Not started
-**Current Phase Name:** defining requirements
-**Total Phases:** 0
+**Current Phase:** 5
+**Current Phase Name:** lifecycle write semantics
+**Total Phases:** 3
 **Current Plan:** None
 **Total Plans in Phase:** 0
-**Status:** Defining requirements
+**Status:** Roadmap defined
 **Last Activity:** 2026-03-12
 
 Progress: [░░░░░░░░░░] 0%
@@ -115,9 +115,9 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Research journal and lifecycle-tool conventions for the v1.1 scope
-- Define v1.1 requirements with traceable REQ-IDs
-- Create a new roadmap starting at Phase 5
+- Start Phase 5 planning for lifecycle write semantics
+- Validate page delete and rename semantics against the isolated graph
+- Lock journal lookup strategy before Phase 6 implementation
 
 ### Blockers/Concerns
 

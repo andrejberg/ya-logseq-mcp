@@ -55,17 +55,17 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| JOUR-01 | TBC | Pending |
-| JOUR-02 | TBC | Pending |
-| JOUR-03 | TBC | Pending |
-| WRIT-06 | TBC | Pending |
-| WRIT-07 | TBC | Pending |
-| WRIT-08 | TBC | Pending |
+| JOUR-01 | Phase 6 | Pending |
+| JOUR-02 | Phase 6 | Pending |
+| JOUR-03 | Phase 7 | Pending |
+| WRIT-06 | Phase 5 | Pending |
+| WRIT-07 | Phase 5 | Pending |
+| WRIT-08 | Phase 6 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 6 total
-- Mapped to phases: 0
-- Unmapped: 6
+- Mapped to phases: 6
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-12*
