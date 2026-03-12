@@ -34,19 +34,21 @@ Plans:
 - [x] 05-02: `delete_page` and `rename_page`
 
 #### Phase 6: Block Moves and Journal Writes
-**Goal**: Deliver move semantics plus journal creation and append flows on top of the existing write architecture.
+**Goal**: Deliver move semantics plus ISO journal creation and append flows on top of the existing write architecture.
 **Depends on**: Phase 5
 **Requirements**: WRIT-08, JOUR-01, JOUR-02
 **Success Criteria** (what must be TRUE):
 1. User can move a block subtree before, after, or as a child of another block and the moved subtree keeps its hierarchy.
-2. User can fetch today's journal page and it is created automatically when absent.
-3. User can append nested blocks to a journal page by date using the same structural guarantees as `block_append`.
-**Plans**: 3 plans
+2. User can fetch today's journal page and it is created automatically when absent on graphs using Logseq `yyyy-MM-dd` journal page titles.
+3. User can append nested blocks to a journal page by `YYYY-MM-DD` date using the same structural guarantees as `block_append` on graphs using Logseq `yyyy-MM-dd` journal page titles.
+**Plans**: 5 plans
 
 Plans:
 - [x] 06-01: `move_block` with subtree verification
 - [x] 06-02: journal helpers and `journal_today`
-- [ ] 06-03: `journal_append`
+- [x] 06-03: `journal_append`
+- [ ] 06-04: document ISO journal scope and reconcile Phase 6 records
+- [ ] 06-05: cross-page `move_block` verification and regression coverage
 
 #### Phase 7: Journal Range and Milestone Validation
 **Goal**: Finish journal history reads and prove the new tool surface over the real MCP entrypoint and isolated live graph.
@@ -76,5 +78,5 @@ Plans:
 | 3. Write Tools | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
-| 6. Block Moves and Journal Writes | v1.1 | 2/3 | In Progress | 2026-03-12 |
+| 6. Block Moves and Journal Writes | v1.1 | 3/5 | In Progress | - |
 | 7. Journal Range and Milestone Validation | v1.1 | 0/3 | Not started | - |
