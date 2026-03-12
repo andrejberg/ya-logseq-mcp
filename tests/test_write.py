@@ -726,7 +726,7 @@ async def test_move_block_before_verifies_relative_placement_and_subtree(token_e
         "logseq.Editor.moveBlock",
         "logseq.Editor.getPageBlocksTree",
     ]
-    assert calls[2] == ("logseq.Editor.moveBlock", ("move-root", "target-root", "before"))
+    assert calls[2] == ("logseq.Editor.moveBlock", ("move-root", "target-root", {"before": True}))
     assert data == {
         "ok": True,
         "uuid": "move-root",

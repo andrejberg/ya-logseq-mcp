@@ -25,6 +25,7 @@ SANDBOX_BASELINE_BLOCKS = [
     "This page is reserved for Phase 4 live mutation tests.",
 ]
 LIFECYCLE_PAGE_PREFIX = "Phase 05 Lifecycle"
+MOVE_PAGE_PREFIX = "Phase 06 Move"
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
 MCP_CONFIG_ENV = "WORKSPACE_MCP_CONFIG"
 MCP_CONFIG_DEFAULT = (Path.home() / "Workspace" / ".mcp.json").resolve()
@@ -300,6 +301,53 @@ async def cleanup_lifecycle_page(client: LogseqClient, page_name: str) -> None:
         pytest.fail(f"Lifecycle page still resolves after cleanup: '{page_name}'")
 
 
+def make_move_page_name(label: str) -> str:
+    normalized_label = "-".join(label.strip().split())
+    if not normalized_label:
+        pytest.fail("Move page label must be a non-empty string")
+
+    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
+    suffix = uuid4().hex[:8]
+    return f"{MOVE_PAGE_PREFIX} {normalized_label} {timestamp}-{suffix}"
+
+
+async def _append_block(client: LogseqClient, page_name: str, content: str) -> str:
+    created = await client._call("logseq.Editor.appendBlockInPage", page_name, content, {})
+    if not isinstance(created, dict) or not isinstance(created.get("uuid"), str) or not created["uuid"]:
+        pytest.fail(f"Failed to append block '{content}' on '{page_name}'")
+    return created["uuid"]
+
+
+async def _insert_child_block(client: LogseqClient, parent_uuid: str, content: str) -> str:
+    created = await client._call("logseq.Editor.insertBlock", parent_uuid, content, {"sibling": False})
+    if not isinstance(created, dict) or not isinstance(created.get("uuid"), str) or not created["uuid"]:
+        pytest.fail(f"Failed to insert child block '{content}' under '{parent_uuid}'")
+    return created["uuid"]
+
+
+async def ensure_move_page(client: LogseqClient, page_name: str) -> dict[str, str]:
+    page = await ensure_lifecycle_page(client, page_name)
+    await _reset_page_blocks(client, page_name)
+
+    anchor_a_uuid = await _append_block(client, page_name, "Move anchor A")
+    anchor_a_child_uuid = await _insert_child_block(client, anchor_a_uuid, "Move anchor A child")
+    source_uuid = await _append_block(client, page_name, "Move source")
+    source_child_uuid = await _insert_child_block(client, source_uuid, "Move source child")
+    source_grandchild_uuid = await _insert_child_block(client, source_child_uuid, "Move source grandchild")
+    anchor_b_uuid = await _append_block(client, page_name, "Move anchor B")
+
+    return {
+        "page_name": page_name,
+        "page_uuid": str(page["uuid"]),
+        "anchor_a_uuid": anchor_a_uuid,
+        "anchor_a_child_uuid": anchor_a_child_uuid,
+        "source_uuid": source_uuid,
+        "source_child_uuid": source_child_uuid,
+        "source_grandchild_uuid": source_grandchild_uuid,
+        "anchor_b_uuid": anchor_b_uuid,
+    }
+
+
 def _build_stdio_env(settings: IsolatedGraphEnv) -> dict[str, str]:
     env = os.environ.copy()
     env["LOGSEQ_API_URL"] = settings.api_url
@@ -437,6 +485,19 @@ def lifecycle_page_factory(
 
 
 @pytest.fixture
+def move_page_factory(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[str], str]:
+    def _runner(label: str) -> str:
+        page_name = make_move_page_name(label)
+        if page_name in {isolated_graph_env.parity_page, isolated_graph_env.sandbox_page}:
+            pytest.fail(f"Move page factory produced a reserved fixture page: {page_name}")
+        return page_name
+
+    return _runner
+
+
+@pytest.fixture
 def ensure_lifecycle_page_fixture(
     isolated_graph_env: IsolatedGraphEnv,
 ) -> Callable[[LogseqClient, str, list[str] | None], Awaitable[dict]]:
@@ -454,6 +515,17 @@ def cleanup_lifecycle_page_fixture(
     async def _runner(client: LogseqClient, page_name: str) -> None:
         await _assert_isolated_graph(client, isolated_graph_env)
         await cleanup_lifecycle_page(client, page_name)
+
+    return _runner
+
+
+@pytest.fixture
+def ensure_move_page_fixture(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient, str], Awaitable[dict[str, str]]]:
+    async def _runner(client: LogseqClient, page_name: str) -> dict[str, str]:
+        await _assert_isolated_graph(client, isolated_graph_env)
+        return await ensure_move_page(client, page_name)
 
     return _runner
 

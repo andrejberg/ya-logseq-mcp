@@ -22,6 +22,7 @@ REQUIRED_TOOLS = {
     "block_append",
     "block_update",
     "block_delete",
+    "move_block",
     "delete_page",
     "rename_page",
 }
@@ -182,6 +183,54 @@ async def test_mcp_lifecycle_round_trip_uses_isolated_graph(
     finally:
         await cleanup_lifecycle_page_fixture(live_client, source_name)
         await cleanup_lifecycle_page_fixture(live_client, target_name)
+
+
+async def test_mcp_move_block_round_trip_uses_isolated_graph(
+    live_client,
+    ensure_move_page_fixture,
+    move_page_factory,
+    cleanup_lifecycle_page_fixture,
+    mcp_session,
+    isolated_graph_env,
+):
+    page_name = move_page_factory("Stdio Move")
+
+    try:
+        fixture = await ensure_move_page_fixture(live_client, page_name)
+
+        async with mcp_session as handle:
+            health_payload = _tool_payload(await handle.session.call_tool("health"))
+            assert health_payload["graph"] == isolated_graph_env.graph_name
+
+            move_payload = _tool_payload(
+                await handle.session.call_tool(
+                    "move_block",
+                    {
+                        "uuid": fixture["source_uuid"],
+                        "target_uuid": fixture["anchor_a_uuid"],
+                        "position": "before",
+                    },
+                )
+            )
+            assert move_payload == {
+                "ok": True,
+                "uuid": fixture["source_uuid"],
+                "target_uuid": fixture["anchor_a_uuid"],
+                "position": "before",
+            }
+
+            page_payload = _tool_payload(await handle.session.call_tool("get_page", {"name": page_name}))
+            top_level = page_payload["blocks"]
+            ordered_uuids = [block["uuid"] for block in top_level]
+            assert ordered_uuids.index(fixture["source_uuid"]) < ordered_uuids.index(fixture["anchor_a_uuid"])
+
+            moved_root = find_block_by_content(page_payload["blocks"], "Move source")
+            assert moved_root is not None
+            assert find_block_by_content([moved_root], "Move source child") is not None
+            assert find_block_by_content([moved_root], "Move source grandchild") is not None
+            assert_protocol_clean_stdout(handle.stderr_text)
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)
 
 
 async def test_server_keeps_logs_off_stdout(mcp_session, isolated_graph_env):

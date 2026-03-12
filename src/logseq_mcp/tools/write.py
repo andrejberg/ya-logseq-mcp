@@ -101,6 +101,14 @@ def _validate_move_position(position: str) -> str:
     return position
 
 
+def _move_block_options(position: str) -> dict:
+    if position == "before":
+        return {"before": True}
+    if position == "child":
+        return {"children": True}
+    return {}
+
+
 def _verify_block_moved(
     block_tree: list[BlockEntity],
     *,
@@ -495,7 +503,7 @@ async def move_block(ctx: Context, uuid: str, target_uuid: str, position: str) -
 
     subtree_uuids = _collect_subtree_uuids(block)
 
-    await client._call("logseq.Editor.moveBlock", uuid, target_uuid, normalized_position)
+    await client._call("logseq.Editor.moveBlock", uuid, target_uuid, _move_block_options(normalized_position))
     await _verify_block_move_readback(
         client,
         moved_uuid=uuid,

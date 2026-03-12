@@ -7,7 +7,7 @@ import pytest
 
 from logseq_mcp.server import AppContext
 from logseq_mcp.tools.core import health
-from logseq_mcp.tools.write import block_append, block_delete, block_update, delete_page, rename_page
+from logseq_mcp.tools.write import block_append, block_delete, block_update, delete_page, move_block, rename_page
 from tests.integration.conftest import LIFECYCLE_PAGE_PREFIX, SANDBOX_BASELINE_BLOCKS, find_block_by_content
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
@@ -19,6 +19,25 @@ def _make_ctx(client) -> SimpleNamespace:
             lifespan_context=AppContext(client=client),
         )
     )
+
+
+def _find_top_level_index(blocks: list[dict], uuid: str) -> int:
+    for index, block in enumerate(blocks):
+        if block.get("uuid") == uuid:
+            return index
+    pytest.fail(f"Top-level block '{uuid}' not found in readback tree")
+
+
+def _find_block_by_uuid(blocks: list[dict], uuid: str) -> dict | None:
+    for block in blocks:
+        if block.get("uuid") == uuid:
+            return block
+        children = block.get("children", [])
+        if isinstance(children, list):
+            nested = _find_block_by_uuid(children, uuid)
+            if nested is not None:
+                return nested
+    return None
 
 
 async def test_health_requires_isolated_graph(
@@ -239,3 +258,122 @@ async def test_namespaced_lifecycle_pages_round_trip(
     finally:
         await cleanup_lifecycle_page_fixture(live_client, source_name)
         await cleanup_lifecycle_page_fixture(live_client, target_name)
+
+
+async def test_move_block_before_preserves_subtree(
+    live_client,
+    assert_isolated_graph,
+    move_page_factory,
+    ensure_move_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    page_name = move_page_factory("Before")
+
+    try:
+        fixture = await ensure_move_page_fixture(live_client, page_name)
+
+        payload = json.loads(
+            await move_block(
+                _make_ctx(live_client),
+                fixture["source_uuid"],
+                fixture["anchor_a_uuid"],
+                "before",
+            )
+        )
+        page_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", page_name)
+
+        assert payload == {
+            "ok": True,
+            "uuid": fixture["source_uuid"],
+            "target_uuid": fixture["anchor_a_uuid"],
+            "position": "before",
+        }
+        assert _find_top_level_index(page_blocks, fixture["source_uuid"]) < _find_top_level_index(
+            page_blocks, fixture["anchor_a_uuid"]
+        )
+        moved = _find_block_by_uuid(page_blocks, fixture["source_uuid"])
+        assert moved is not None
+        assert _find_block_by_uuid([moved], fixture["source_child_uuid"]) is not None
+        assert _find_block_by_uuid([moved], fixture["source_grandchild_uuid"]) is not None
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)
+
+
+async def test_move_block_after_preserves_subtree(
+    live_client,
+    assert_isolated_graph,
+    move_page_factory,
+    ensure_move_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    page_name = move_page_factory("After")
+
+    try:
+        fixture = await ensure_move_page_fixture(live_client, page_name)
+
+        payload = json.loads(
+            await move_block(
+                _make_ctx(live_client),
+                fixture["source_uuid"],
+                fixture["anchor_b_uuid"],
+                "after",
+            )
+        )
+        page_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", page_name)
+
+        assert payload == {
+            "ok": True,
+            "uuid": fixture["source_uuid"],
+            "target_uuid": fixture["anchor_b_uuid"],
+            "position": "after",
+        }
+        assert _find_top_level_index(page_blocks, fixture["source_uuid"]) > _find_top_level_index(
+            page_blocks, fixture["anchor_b_uuid"]
+        )
+        moved = _find_block_by_uuid(page_blocks, fixture["source_uuid"])
+        assert moved is not None
+        assert _find_block_by_uuid([moved], fixture["source_child_uuid"]) is not None
+        assert _find_block_by_uuid([moved], fixture["source_grandchild_uuid"]) is not None
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)
+
+
+async def test_move_block_child_preserves_subtree(
+    live_client,
+    assert_isolated_graph,
+    move_page_factory,
+    ensure_move_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    page_name = move_page_factory("Child")
+
+    try:
+        fixture = await ensure_move_page_fixture(live_client, page_name)
+
+        payload = json.loads(
+            await move_block(
+                _make_ctx(live_client),
+                fixture["source_uuid"],
+                fixture["anchor_b_uuid"],
+                "child",
+            )
+        )
+        page_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", page_name)
+
+        assert payload == {
+            "ok": True,
+            "uuid": fixture["source_uuid"],
+            "target_uuid": fixture["anchor_b_uuid"],
+            "position": "child",
+        }
+        anchor_b = _find_block_by_uuid(page_blocks, fixture["anchor_b_uuid"])
+        assert anchor_b is not None
+        moved = _find_block_by_uuid(anchor_b.get("children", []), fixture["source_uuid"])
+        assert moved is not None
+        assert _find_block_by_uuid([moved], fixture["source_child_uuid"]) is not None
+        assert _find_block_by_uuid([moved], fixture["source_grandchild_uuid"]) is not None
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)

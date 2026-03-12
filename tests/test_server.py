@@ -22,6 +22,7 @@ def test_tool_registered(token_env):
         "block_append",
         "block_update",
         "block_delete",
+        "move_block",
         "delete_page",
         "rename_page",
     }
