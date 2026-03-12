@@ -47,7 +47,7 @@ Plans:
 - [x] 06-01: `move_block` with subtree verification
 - [x] 06-02: journal helpers and `journal_today`
 - [x] 06-03: `journal_append`
-- [ ] 06-04: document ISO journal scope and reconcile Phase 6 records
+- [x] 06-04: document ISO journal scope and reconcile Phase 6 records
 - [ ] 06-05: cross-page `move_block` verification and regression coverage
 
 #### Phase 7: Journal Range and Milestone Validation
@@ -78,5 +78,5 @@ Plans:
 | 3. Write Tools | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
-| 6. Block Moves and Journal Writes | v1.1 | 3/5 | In Progress | - |
+| 6. Block Moves and Journal Writes | v1.1 | 4/5 | In Progress | - |
 | 7. Journal Range and Milestone Validation | v1.1 | 0/3 | Not started | - |

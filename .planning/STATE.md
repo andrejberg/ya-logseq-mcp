@@ -4,17 +4,17 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
-current_plan: 4
-status: planning
-stopped_at: Planned Phase 06 gap-closure follow-up after verification
-last_updated: "2026-03-12T15:30:00.000Z"
+current_plan: 5
+status: executing
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-03-12T14:58:18.815Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 10
-  completed_plans: 5
-  percent: 50
+  completed_plans: 6
+  percent: 60
 ---
 
 # Project State
@@ -24,19 +24,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 6 gap closure: document the accepted ISO journal scope and close the remaining cross-page move verification gap
+**Current focus:** Phase 6 gap closure: implement and verify the remaining cross-page `move_block` readback behavior
 
 ## Current Position
 
 **Current Phase:** 6
 **Current Phase Name:** block moves and journal writes
 **Total Phases:** 3
-**Current Plan:** 4
+**Current Plan:** 5
 **Total Plans in Phase:** 5
-**Status:** Phase 6 gap closure in progress
+**Status:** Ready to execute
 **Last Activity:** 2026-03-12
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [█████░░░░░] 50%
 | Phase 06 P01 | 18min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P02 | 4min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P03 | 6min | 2 tasks | 6 files |
+| Phase 06-block-moves-and-journal-writes P04 | 8min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -131,10 +132,10 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: Live and stdio journal creation tests use LOGSEQ_MCP_TEST_TODAY to target disposable future journal dates.
 - [Phase 06-block-moves-and-journal-writes]: journal_append returns the block_append payload shape while resolving targets through the shared journal helper contract
 - [Phase 06-block-moves-and-journal-writes]: Disposable future journal dates remain the isolation contract for live and stdio journal append verification
+- [Phase 06-block-moves-and-journal-writes]: WRIT-08 remains in progress until cross-page move readback verification is implemented and verified.
 
 ### Pending Todos
 
-- Execute `06-04` to document accepted ISO journal scope across the remaining Phase 6 records
 - Execute `06-05` to close the cross-page `move_block` verification gap and re-run Phase 6 verification
 
 ### Blockers/Concerns
@@ -144,6 +145,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:30:00.000Z
-**Stopped At:** Planned Phase 06 gap-closure follow-up after verification
+Last session: 2026-03-12T14:58:18.811Z
+**Stopped At:** Completed 06-04-PLAN.md
 **Resume File:** None
