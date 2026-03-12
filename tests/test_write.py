@@ -664,3 +664,313 @@ async def test_lifecycle_tools_preserve_namespaced_page_names(token_env):
         "logseq.Editor.getPage",
         "logseq.Editor.getPage",
     ]
+
+
+async def test_move_block_before_verifies_relative_placement_and_subtree(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    calls = []
+    source_block = {
+        "id": 100,
+        "uuid": "move-root",
+        "content": "move root",
+        "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+        "children": [
+            {"id": 101, "uuid": "move-child", "content": "move child", "children": []},
+            {"id": 102, "uuid": "move-grandchild", "content": "move grandchild", "children": []},
+        ],
+    }
+    target_block = {
+        "id": 200,
+        "uuid": "target-root",
+        "content": "target root",
+        "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+        "children": [],
+    }
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getBlock":
+            block_uuid = args[0]
+            if block_uuid == "move-root":
+                return source_block
+            if block_uuid == "target-root":
+                return target_block
+        if method == "logseq.Editor.moveBlock":
+            return {"uuid": "move-root"}
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "children": [
+                        {"id": 101, "uuid": "move-child", "content": "move child", "children": []},
+                        {"id": 102, "uuid": "move-grandchild", "content": "move grandchild", "children": []},
+                    ],
+                },
+                {"id": 200, "uuid": "target-root", "content": "target root", "children": []},
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
+    data = json.loads(result)
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getBlock",
+        "logseq.Editor.getBlock",
+        "logseq.Editor.moveBlock",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert calls[2] == ("logseq.Editor.moveBlock", ("move-root", "target-root", "before"))
+    assert data == {
+        "ok": True,
+        "uuid": "move-root",
+        "target_uuid": "target-root",
+        "position": "before",
+    }
+
+
+async def test_move_block_after_verifies_relative_placement_and_subtree(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                }
+            if args[0] == "target-root":
+                return {
+                    "id": 200,
+                    "uuid": "target-root",
+                    "content": "target root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [],
+                }
+        if method == "logseq.Editor.moveBlock":
+            return True
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {"id": 200, "uuid": "target-root", "content": "target root", "children": []},
+                {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                },
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="after")
+    data = json.loads(result)
+
+    assert data == {
+        "ok": True,
+        "uuid": "move-root",
+        "target_uuid": "target-root",
+        "position": "after",
+    }
+
+
+async def test_move_block_child_verifies_relative_placement_and_subtree(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                }
+            if args[0] == "target-root":
+                return {
+                    "id": 200,
+                    "uuid": "target-root",
+                    "content": "target root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [
+                        {"id": 201, "uuid": "existing-child", "content": "existing child", "children": []},
+                        {
+                            "id": 100,
+                            "uuid": "move-root",
+                            "content": "move root",
+                            "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                        },
+                    ],
+                }
+        if method == "logseq.Editor.moveBlock":
+            return None
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {
+                    "id": 200,
+                    "uuid": "target-root",
+                    "content": "target root",
+                    "children": [
+                        {"id": 201, "uuid": "existing-child", "content": "existing child", "children": []},
+                        {
+                            "id": 100,
+                            "uuid": "move-root",
+                            "content": "move root",
+                            "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                        },
+                    ],
+                }
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="child")
+    data = json.loads(result)
+
+    assert data == {
+        "ok": True,
+        "uuid": "move-root",
+        "target_uuid": "target-root",
+        "position": "child",
+    }
+
+
+@pytest.mark.parametrize("position", ["", "left", "sibling"])
+async def test_move_block_rejects_invalid_position(token_env, position):
+    from logseq_mcp.tools.write import move_block
+
+    mock_ctx = _make_ctx()
+
+    with pytest.raises(McpError, match="position must be one of: after, before, child"):
+        await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position=position)
+
+
+async def test_move_block_fails_when_source_block_missing(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            return None
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="block not found: move-root"):
+        await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
+
+
+async def test_move_block_fails_when_target_block_missing(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [],
+                }
+            return None
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="block not found: target-root"):
+        await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
+
+
+async def test_move_block_fails_when_subtree_descendants_are_lost(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                }
+            if args[0] == "target-root":
+                return {
+                    "id": 200,
+                    "uuid": "target-root",
+                    "content": "target root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [],
+                }
+        if method == "logseq.Editor.moveBlock":
+            return True
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {"id": 100, "uuid": "move-root", "content": "move root", "children": []},
+                {"id": 200, "uuid": "target-root", "content": "target root", "children": []},
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="moved subtree lost descendants after move: move-root"):
+        await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
+
+
+async def test_move_block_fails_when_readback_does_not_match_requested_position(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return {
+                    "id": 100,
+                    "uuid": "move-root",
+                    "content": "move root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [],
+                }
+            if args[0] == "target-root":
+                return {
+                    "id": 200,
+                    "uuid": "target-root",
+                    "content": "target root",
+                    "page": {"id": 1, "uuid": "page-uuid", "name": "Sandbox"},
+                    "children": [],
+                }
+        if method == "logseq.Editor.moveBlock":
+            return True
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {"id": 200, "uuid": "target-root", "content": "target root", "children": []},
+                {"id": 100, "uuid": "move-root", "content": "move root", "children": []},
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="move verification failed for block: move-root"):
+        await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
