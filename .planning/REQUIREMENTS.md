@@ -8,7 +8,7 @@
 
 ### Journals
 
-- [ ] **JOUR-01**: User can fetch today's journal page and the server creates it if it does not already exist.
+- [x] **JOUR-01**: User can fetch today's journal page and the server creates it if it does not already exist.
 - [ ] **JOUR-02**: User can append blocks to a journal page by `YYYY-MM-DD` date using the same nested block contract as `block_append`.
 - [ ] **JOUR-03**: User can fetch journal entries for an inclusive date range and invalid or reversed date ranges fail explicitly.
 
@@ -55,7 +55,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| JOUR-01 | Phase 6 | Pending |
+| JOUR-01 | Phase 6 | Complete |
 | JOUR-02 | Phase 6 | Pending |
 | JOUR-03 | Phase 7 | Pending |
 | WRIT-06 | Phase 5 | Complete |

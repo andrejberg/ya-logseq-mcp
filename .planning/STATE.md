@@ -4,16 +4,16 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
-current_plan: 02
-status: ready_to_execute
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-12T14:04:51Z"
+current_plan: 3
+status: executing
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-12T14:17:29.512Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 94
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Current Phase:** 6
 **Current Phase Name:** block moves and journal writes
 **Total Phases:** 7
-**Current Plan:** 02
+**Current Plan:** 3
 **Total Plans in Phase:** 3
 **Status:** Ready to execute
 **Last Activity:** 2026-03-12
@@ -74,6 +74,7 @@ Progress: [█████████░] 94%
 | Phase 05 P01 | 5min | 2 tasks | 4 files |
 | Phase 05 P02 | 4min | 2 tasks | 5 files |
 | Phase 06 P01 | 18min | 2 tasks | 6 files |
+| Phase 06-block-moves-and-journal-writes P02 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,9 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: `move_block` keeps the public `before`/`after`/`child` API but maps those positions to Logseq's observed `moveBlock` opts contract (`before` => `{before: true}`, `child` => `{children: true}`, `after` => `{}`).
 - [Phase 06-block-moves-and-journal-writes]: Move success is determined from `getPageBlocksTree` readback, proving both relative placement and subtree preservation instead of trusting the `moveBlock` return payload.
 - [Phase 06-block-moves-and-journal-writes]: Disposable Phase 6 move pages extend the isolated graph harness so destructive move tests never touch the Phase 4 parity or sandbox fixtures.
+- [Phase 06-block-moves-and-journal-writes]: Journal title resolution is centralized in _resolve_journal_page_name and fails explicitly for non-ISO page-title formats.
+- [Phase 06-block-moves-and-journal-writes]: journal_today verifies journal readback after createPage instead of trusting the mutation response.
+- [Phase 06-block-moves-and-journal-writes]: Live and stdio journal creation tests use LOGSEQ_MCP_TEST_TODAY to target disposable future journal dates.
 
 ### Pending Todos
 
@@ -136,6 +140,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T14:04:51Z
-**Stopped At:** Completed 06-01-PLAN.md
+Last session: 2026-03-12T14:17:29.505Z
+**Stopped At:** Completed 06-02-PLAN.md
 **Resume File:** None
