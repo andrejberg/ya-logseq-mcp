@@ -1,6 +1,6 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
+milestone: v1.1
 milestone_name: journals and lifecycle tools
 current_phase: null
 current_phase_name: not started
