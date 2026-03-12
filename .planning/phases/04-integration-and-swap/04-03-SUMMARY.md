@@ -61,7 +61,7 @@ completed: 2026-03-12
 Each task was committed atomically:
 
 1. **Task 1: Add structural parity tests against graphthulhu on the fixed fixture page** - `9ccc58b`, `6614460`, `5b7ffbb` (feat/test/feat)
-2. **Task 2: Execute the side-by-side manual smoke gate and record sign-off** - `PENDING_COMMIT` (fix)
+2. **Task 2: Execute the side-by-side manual smoke gate and record sign-off** - `a4571e9` (fix)
 
 ## Files Created/Modified
 - `tests/integration/conftest.py` - adds the graphthulhu MCP session and parity-test environment hooks used by the new integration coverage.
@@ -94,7 +94,7 @@ Each task was committed atomically:
 - **Fix:** Coerced namespace page refs to strings in `PageEntity` and added regression tests that cover the production payload shape.
 - **Files modified:** `src/logseq_mcp/types.py`, `tests/test_core.py`, `tests/test_types.py`
 - **Verification:** `uv run pytest tests/test_types.py tests/test_core.py -q` and `uv run pytest tests/ -v -m "not integration"`
-- **Committed in:** `PENDING_COMMIT`
+- **Committed in:** `a4571e9`
 
 ---
 
