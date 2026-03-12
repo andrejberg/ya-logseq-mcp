@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A custom Python MCP server for Logseq that replaces graphthulhu — a Go-based MCP server with unpredictable behavior. This is a from-scratch rewrite focused on correct Logseq block structure, lean output, and full maintainability. Built for one user's workspace workflow.
+A custom Python MCP server for Logseq that has now shipped as the replacement path for graphthulhu in this workspace. It is a from-scratch rewrite focused on correct Logseq block structure, lean output, maintainability, and safe daily-driver rollout.
 
 ## Core Value
 
@@ -12,34 +12,24 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. -->
-
-(None yet — ship to validate)
+- ✓ Async HTTP client talks to Logseq API with retry/auth and single-flight request serialization — v1.0
+- ✓ `health` verifies live Logseq connectivity over the production MCP server entrypoint — v1.0
+- ✓ `get_page` returns deduplicated block trees with correct parent/child nesting — v1.0
+- ✓ `get_block`, `list_pages`, and `get_references` cover the core daily-driver read surface — v1.0
+- ✓ `page_create`, `block_append`, `block_update`, and `block_delete` produce valid Logseq content and verify mutations through follow-up reads — v1.0
+- ✓ Integration coverage runs against an isolated graph and proves parity against graphthulhu on the fixed fixture page — v1.0
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
-
-- [ ] Async HTTP client talks to Logseq API with retry and auth
-- [ ] `get_page` returns deduplicated block tree with correct parent/child nesting
-- [ ] `get_block` returns a single block by UUID with optional children
-- [ ] `list_pages` returns pages with optional namespace/tag/property filter
-- [ ] `get_references` returns backlinks to a page
 - [ ] `find_by_tag` finds blocks/pages by tag via DataScript
 - [ ] `query_properties` finds blocks/pages by property key/value via DataScript
 - [ ] `query` passes raw DataScript queries through
-- [ ] `page_create` creates a page with properties and initial blocks
-- [ ] `block_append` appends blocks (flat strings or nested objects) with correct indentation
-- [ ] `block_update` updates block content by UUID
-- [ ] `block_delete` deletes a block by UUID
 - [ ] `delete_page` deletes a page entirely
 - [ ] `rename_page` renames a page (Logseq updates links)
 - [ ] `move_block` moves a block to a new location
 - [ ] `journal_today` gets or creates today's journal page
 - [ ] `journal_append` appends blocks to a journal page by date
 - [ ] `journal_range` fetches journal entries for a date range
-- [ ] `health` tool verifies connectivity and returns graph info
-- [ ] Integration tests run against a local test graph (isolated from real graph)
 
 ### Out of Scope
 
@@ -75,11 +65,32 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Python over Go | Maintainability — can debug and adapt; API is HTTP-bound not CPU-bound | — Pending |
-| Lean output by default | graphthulhu's verbose enrichment was unnecessary; keep responses minimal | — Pending |
-| Deduplicate by UUID | Fix graphthulhu's 4-8x block duplication bug at read time | — Pending |
-| Local test graph for integration tests | API targets open graph; isolated test graph keeps real data safe | — Pending |
-| Core + Write + Journal first | Daily-driver tools define swap threshold; kanban/templates are v2 | — Pending |
+| Python over Go | Maintainability — can debug and adapt; API is HTTP-bound not CPU-bound | ✓ Good |
+| Lean output by default | graphthulhu's verbose enrichment was unnecessary; keep responses minimal | ✓ Good |
+| Deduplicate by UUID | Fix graphthulhu's 4-8x block duplication bug at read time | ✓ Good |
+| Local test graph for integration tests | API targets open graph; isolated test graph keeps real data safe | ✓ Good |
+| Core + Write + Journal first | Daily-driver tools define swap threshold; kanban/templates are v2 | ⚠ Revisit |
+
+## Current State
+
+- Shipped milestone: `v1.0` on 2026-03-12
+- Delivered surface: `health`, `get_page`, `get_block`, `list_pages`, `get_references`, `page_create`, `block_append`, `block_update`, `block_delete`
+- Validation state: isolated live graph, MCP stdio transport, and structural graphthulhu parity are all complete
+- Rollout state: `logseq-mcp` passed the shared-config smoke gate while graphthulhu remains available as fallback
+- Known archive debt: milestone audit is `tech_debt` because the Phase 1 live-health evidence trail and Phases 1/3 Nyquist cleanup remain partial
+
+## Next Milestone Goals
+
+- Turn the deferred query, journal, and additional write tools into a scoped next milestone rather than broad backlog carry-over.
+- Decide whether graphthulhu fallback can be removed after enough daily-driver time on `logseq-mcp`.
+- Close the archive hygiene debt if full audit cleanliness matters: reconcile the explicit `FOUN-07` live checkpoint trail and finish Nyquist cleanup for Phases 1 and 3.
+
+## Context
+
+- Codebase state at v1.0: 59 files changed across the milestone and roughly 2,658 lines across `src/` and `tests/`
+- Tech stack in use: Python 3.12+, FastMCP, httpx, Pydantic v2, pytest, uv
+- User feedback learned during rollout: real shared-graph validation matters because namespaced production pages exposed a payload shape the isolated graph did not
+- Operational note: keep both `logseq-mcp` and graphthulhu in the shared MCP config until a deliberate cleanup phase removes the fallback
 
 ---
-*Last updated: 2026-03-09 after initialization*
+*Last updated: 2026-03-12 after v1.0 milestone completion*

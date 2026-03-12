@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-current_phase: 4
-current_phase_name: integration and swap
-current_plan: 3
-status: complete
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-12T12:00:00Z"
+milestone_name: archived
+current_phase: null
+current_phase_name: milestone archived
+current_plan: null
+status: archived
+stopped_at: Archived v1.0 milestone and prepared for next milestone creation
+last_updated: "2026-03-12T13:00:00Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 4
@@ -21,19 +21,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-09)
+See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 4 complete; rollout validation passed and the milestone is ready for archive
+**Current focus:** v1.0 archived; define the next milestone before adding new roadmap phases
 
 ## Current Position
 
-**Current Phase:** 4
-**Current Phase Name:** integration and swap
+**Current Phase:** None
+**Current Phase Name:** milestone archived
 **Total Phases:** 4
-**Current Plan:** 3
-**Total Plans in Phase:** 3
-**Status:** Complete
+**Current Plan:** None
+**Total Plans in Phase:** 0
+**Status:** Archived
 **Last Activity:** 2026-03-12
 
 Progress: [██████████] 100%
@@ -119,10 +119,11 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- No active milestone defined. Start the next cycle with `$gsd-new-milestone`.
+- v1.0 archive carries known tech debt from the milestone audit: partial Nyquist cleanup in Phases 1 and 3 plus indirect Phase 1 live-health evidence.
 
 ## Session Continuity
 
 Last session: 2026-03-12T12:00:00.000Z
-**Stopped At:** Completed 04-03-PLAN.md
+**Stopped At:** Archived v1.0 milestone and removed active REQUIREMENTS.md for next-cycle reset
 **Resume File:** None
