@@ -23,8 +23,10 @@ SANDBOX_BASELINE_BLOCKS = [
     "This page is reserved for Phase 4 live mutation tests.",
 ]
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
-GRAPHTHULHU_CONFIG_ENV = "GRAPHTHULHU_MCP_CONFIG"
-GRAPHTHULHU_CONFIG_REQUIRED = (Path.home() / ".claude" / ".mcp-graphthulhu.json").resolve()
+MCP_CONFIG_ENV = "WORKSPACE_MCP_CONFIG"
+MCP_CONFIG_DEFAULT = (Path.home() / "Workspace" / ".mcp.json").resolve()
+GRAPHTHULHU_SERVER_NAME_ENV = "GRAPHTHULHU_MCP_SERVER"
+GRAPHTHULHU_SERVER_NAME_DEFAULT = "graphthulhu"
 
 
 @dataclass(frozen=True)
@@ -66,45 +68,44 @@ def _require_env(name: str) -> str:
     return value
 
 
-def _require_graphthulhu_config_path() -> Path:
-    configured = os.environ.get(GRAPHTHULHU_CONFIG_ENV, "").strip()
-    if not configured:
-        pytest.fail(
-            f"{GRAPHTHULHU_CONFIG_ENV} is required for graphthulhu parity tests. "
-            f"Export {GRAPHTHULHU_CONFIG_ENV}={GRAPHTHULHU_CONFIG_REQUIRED} before running this selection."
-        )
-    config_path = Path(configured).expanduser().resolve()
-    if config_path != GRAPHTHULHU_CONFIG_REQUIRED:
-        pytest.fail(
-            f"{GRAPHTHULHU_CONFIG_ENV} must point to {GRAPHTHULHU_CONFIG_REQUIRED} for the canonical parity run. "
-            f"Configured path: {config_path}"
-        )
+def _workspace_mcp_config_path() -> Path:
+    configured = os.environ.get(MCP_CONFIG_ENV, "").strip()
+    config_path = Path(configured).expanduser().resolve() if configured else MCP_CONFIG_DEFAULT
     if not config_path.is_file():
         pytest.fail(
-            f"{GRAPHTHULHU_CONFIG_ENV} must point to the graphthulhu-only MCP config. "
+            f"Workspace MCP config is required for graphthulhu parity tests. "
             f"Configured path does not exist: {config_path}"
         )
     return config_path
 
 
-def _load_external_mcp_server_config(config_path: Path) -> ExternalMcpServerConfig:
+def _graphthulhu_server_name() -> str:
+    server_name = os.environ.get(GRAPHTHULHU_SERVER_NAME_ENV, GRAPHTHULHU_SERVER_NAME_DEFAULT).strip()
+    if not server_name:
+        pytest.fail(f"{GRAPHTHULHU_SERVER_NAME_ENV} must be a non-empty MCP server name")
+    return server_name
+
+
+def _load_external_mcp_server_config(config_path: Path, server_name: str) -> ExternalMcpServerConfig:
     try:
         raw = json.loads(config_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        pytest.fail(f"Failed to parse graphthulhu MCP config {config_path}: {exc}")
+        pytest.fail(f"Failed to parse workspace MCP config {config_path}: {exc}")
 
     if not isinstance(raw, dict):
-        pytest.fail(f"Graphthulhu MCP config must be a JSON object: {config_path}")
+        pytest.fail(f"Workspace MCP config must be a JSON object: {config_path}")
 
-    config = raw
     servers = raw.get("mcpServers")
-    if isinstance(servers, dict):
-        if len(servers) != 1:
-            pytest.fail(
-                "Graphthulhu parity tests require a graphthulhu-only MCP config with exactly one server entry. "
-                f"Found {len(servers)} entries in {config_path}"
-            )
-        config = next(iter(servers.values()))
+    if not isinstance(servers, dict):
+        pytest.fail(f"Workspace MCP config must define an mcpServers object: {config_path}")
+
+    config = servers.get(server_name)
+    if not isinstance(config, dict):
+        available = ", ".join(sorted(name for name in servers if isinstance(name, str)))
+        pytest.fail(
+            f"Workspace MCP config {config_path} does not define server '{server_name}'. "
+            f"Available servers: {available or '(none)'}"
+        )
 
     if not isinstance(config, dict):
         pytest.fail(f"Graphthulhu server config is invalid in {config_path}")
@@ -339,7 +340,7 @@ def mcp_session(isolated_graph_env: IsolatedGraphEnv) -> AsyncIterator[StdioServ
 
 @pytest.fixture
 def graphthulhu_mcp_config() -> ExternalMcpServerConfig:
-    return _load_external_mcp_server_config(_require_graphthulhu_config_path())
+    return _load_external_mcp_server_config(_workspace_mcp_config_path(), _graphthulhu_server_name())
 
 
 @pytest.fixture

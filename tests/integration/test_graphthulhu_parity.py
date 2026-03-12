@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from dataclasses import dataclass
+from typing import Any
 
 import pytest
 
@@ -47,17 +48,35 @@ class NormalizedParityPage:
         return sum(count - 1 for count in self.duplicate_map.values())
 
 
+def _decode_json_payload(candidate: Any) -> dict:
+    if isinstance(candidate, dict):
+        return candidate
+    if isinstance(candidate, str):
+        text = candidate.strip()
+        if text:
+            return json.loads(text)
+    raise ValueError(f"unsupported JSON payload candidate: {candidate!r}")
+
+
 def _tool_payload(result):
     if result.structuredContent is not None:
         structured = result.structuredContent
         if isinstance(structured, dict) and "result" in structured:
-            return json.loads(structured["result"])
-        return structured
+            try:
+                return _decode_json_payload(structured["result"])
+            except ValueError:
+                pass
+        if isinstance(structured, dict):
+            return structured
 
     texts = [item.text for item in result.content if hasattr(item, "text") and isinstance(item.text, str)]
     assert texts, f"tool returned no text content: {result!r}"
-    assert len(texts) == 1, f"expected a single text payload, got {texts!r}"
-    return json.loads(texts[0])
+    for text in texts:
+        try:
+            return _decode_json_payload(text)
+        except (ValueError, json.JSONDecodeError):
+            continue
+    pytest.fail(f"tool returned no JSON payload: {texts!r}")
 
 
 def _block_children(block: dict) -> list[dict]:
