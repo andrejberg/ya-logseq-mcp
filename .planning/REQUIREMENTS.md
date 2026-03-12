@@ -10,7 +10,7 @@
 
 - [x] **JOUR-01**: User can fetch today's journal page and the server creates it if it does not already exist, for graphs using Logseq `yyyy-MM-dd` journal page titles.
 - [x] **JOUR-02**: User can append blocks to a journal page by `YYYY-MM-DD` date using the same nested block contract as `block_append`, for graphs using Logseq `yyyy-MM-dd` journal page titles.
-- [ ] **JOUR-03**: User can fetch journal entries for an inclusive date range and invalid or reversed date ranges fail explicitly.
+- [x] **JOUR-03**: User can fetch journal entries for an inclusive date range and invalid or reversed date ranges fail explicitly.
 
 ### Lifecycle Writes
 
@@ -57,7 +57,7 @@
 |-------------|-------|--------|
 | JOUR-01 | Phase 6 | Complete |
 | JOUR-02 | Phase 6 | Complete |
-| JOUR-03 | Phase 7 | Pending |
+| JOUR-03 | Phase 7 | Complete |
 | WRIT-06 | Phase 5 | Complete |
 | WRIT-07 | Phase 5 | Complete |
 | WRIT-08 | Phase 6 | Complete |

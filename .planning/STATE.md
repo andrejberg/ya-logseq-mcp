@@ -4,17 +4,17 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 7
 current_phase_name: journal range and milestone validation
-current_plan: Not started
-status: planning
-stopped_at: Completed 06-05-PLAN.md
-last_updated: "2026-03-12T15:09:28.165Z"
+current_plan: 1
+status: in-progress
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-12T21:54:39Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 7
-  completed_plans: 7
-  percent: 60
+  completed_plans: 8
+  percent: 65
 ---
 
 # Project State
@@ -31,12 +31,12 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Current Phase:** 7
 **Current Phase Name:** journal range and milestone validation
 **Total Phases:** 3
-**Current Plan:** Not started
+**Current Plan:** 1 (completed)
 **Total Plans in Phase:** 5
-**Status:** Ready to plan
+**Status:** In progress
 **Last Activity:** 2026-03-12
 
-Progress: [██████░░░░] 60%
+Progress: [██████▌░░░] 65%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Progress: [██████░░░░] 60%
 | Phase 06-block-moves-and-journal-writes P02 | 4min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P03 | 6min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P04 | 8min | 2 tasks | 5 files |
+| Phase 07-journal-range-and-milestone-validation P01 | 8min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,10 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: `move_block` verifies cross-page moves from the destination page tree and confirms the moved root disappears from the source page when page context is available.
 - [Phase 06]: Cross-page move integration coverage uses disposable source and destination pages in both live and stdio tests
 - [Phase 06]: move_block now verifies cross-page moves from the destination page tree and only checks source-page absence as a secondary assertion
+- [Phase 07-journal-range]: journal_range uses bounded direct date lookup (iterate from start to end, resolve ISO page name directly) to avoid getAllPages scan
+- [Phase 07-journal-range]: _parse_journal_date accepts a field keyword arg so McpError messages distinguish invalid start_date from invalid end_date
+- [Phase 07-journal-range]: Reversed range is an explicit McpError, not silent empty result, to surface caller bugs
+- [Phase 07-journal-range]: Non-journal page hit during range lookup raises McpError to preserve ISO date contract integrity
 
 ### Pending Todos
 
@@ -147,6 +152,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:06:02.759Z
-**Stopped At:** Completed 06-05-PLAN.md
+Last session: 2026-03-12T21:54:39Z
+**Stopped At:** Completed 07-01-PLAN.md
 **Resume File:** None
