@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,6 +26,7 @@ SANDBOX_BASELINE_BLOCKS = [
 ]
 LIFECYCLE_PAGE_PREFIX = "Phase 05 Lifecycle"
 MOVE_PAGE_PREFIX = "Phase 06 Move"
+JOURNAL_PAGE_TITLE_FORMAT = "yyyy-MM-dd"
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
 MCP_CONFIG_ENV = "WORKSPACE_MCP_CONFIG"
 MCP_CONFIG_DEFAULT = (Path.home() / "Workspace" / ".mcp.json").resolve()
@@ -301,6 +302,19 @@ async def cleanup_lifecycle_page(client: LogseqClient, page_name: str) -> None:
         pytest.fail(f"Lifecycle page still resolves after cleanup: '{page_name}'")
 
 
+def make_journal_page_name(days_from_today: int = 0) -> str:
+    if not isinstance(days_from_today, int):
+        pytest.fail("Journal page day offset must be an integer")
+    if JOURNAL_PAGE_TITLE_FORMAT != "yyyy-MM-dd":
+        pytest.fail(f"Unsupported journal page title format for tests: {JOURNAL_PAGE_TITLE_FORMAT}")
+
+    return (date.today() + timedelta(days=days_from_today)).isoformat()
+
+
+async def cleanup_journal_page(client: LogseqClient, page_name: str) -> None:
+    await cleanup_lifecycle_page(client, page_name)
+
+
 def make_move_page_name(label: str) -> str:
     normalized_label = "-".join(label.strip().split())
     if not normalized_label:
@@ -498,6 +512,14 @@ def move_page_factory(
 
 
 @pytest.fixture
+def journal_page_factory() -> Callable[[int], str]:
+    def _runner(days_from_today: int = 30) -> str:
+        return make_journal_page_name(days_from_today)
+
+    return _runner
+
+
+@pytest.fixture
 def ensure_lifecycle_page_fixture(
     isolated_graph_env: IsolatedGraphEnv,
 ) -> Callable[[LogseqClient, str, list[str] | None], Awaitable[dict]]:
@@ -515,6 +537,17 @@ def cleanup_lifecycle_page_fixture(
     async def _runner(client: LogseqClient, page_name: str) -> None:
         await _assert_isolated_graph(client, isolated_graph_env)
         await cleanup_lifecycle_page(client, page_name)
+
+    return _runner
+
+
+@pytest.fixture
+def cleanup_journal_page_fixture(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient, str], Awaitable[None]]:
+    async def _runner(client: LogseqClient, page_name: str) -> None:
+        await _assert_isolated_graph(client, isolated_graph_env)
+        await cleanup_journal_page(client, page_name)
 
     return _runner
 

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from datetime import date, datetime
 
 from mcp import McpError
@@ -105,6 +106,12 @@ def _validate_move_position(position: str) -> str:
 
 
 def _today_date() -> date:
+    override = os.environ.get("LOGSEQ_MCP_TEST_TODAY", "").strip()
+    if override:
+        try:
+            return date.fromisoformat(override)
+        except ValueError as exc:
+            raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"invalid LOGSEQ_MCP_TEST_TODAY: {override}")) from exc
     return datetime.now().date()
 
 

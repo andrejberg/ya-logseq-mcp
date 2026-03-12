@@ -7,7 +7,15 @@ import pytest
 
 from logseq_mcp.server import AppContext
 from logseq_mcp.tools.core import health
-from logseq_mcp.tools.write import block_append, block_delete, block_update, delete_page, move_block, rename_page
+from logseq_mcp.tools.write import (
+    block_append,
+    block_delete,
+    block_update,
+    delete_page,
+    journal_today,
+    move_block,
+    rename_page,
+)
 from tests.integration.conftest import LIFECYCLE_PAGE_PREFIX, SANDBOX_BASELINE_BLOCKS, find_block_by_content
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
@@ -377,3 +385,32 @@ async def test_move_block_child_preserves_subtree(
         assert _find_block_by_uuid([moved], fixture["source_grandchild_uuid"]) is not None
     finally:
         await cleanup_lifecycle_page_fixture(live_client, page_name)
+
+
+async def test_journal_today_creates_missing_journal_page(
+    live_client,
+    assert_isolated_graph,
+    journal_page_factory,
+    cleanup_journal_page_fixture,
+    monkeypatch,
+):
+    await assert_isolated_graph(live_client)
+    page_name = journal_page_factory()
+    monkeypatch.setenv("LOGSEQ_MCP_TEST_TODAY", page_name)
+
+    await cleanup_journal_page_fixture(live_client, page_name)
+
+    try:
+        payload = json.loads(await journal_today(_make_ctx(live_client)))
+        readback_page = await live_client._call("logseq.Editor.getPage", page_name)
+
+        assert payload["created"] is True
+        assert payload["page"]["name"] == page_name
+        assert payload["page"]["journal"] is True
+        assert payload["block_count"] == 0
+        assert payload["blocks"] == []
+        assert isinstance(readback_page, dict)
+        assert readback_page.get("name") == page_name
+        assert readback_page.get("journal?") is True
+    finally:
+        await cleanup_journal_page_fixture(live_client, page_name)

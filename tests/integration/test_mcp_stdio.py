@@ -8,6 +8,7 @@ from tests.integration.conftest import (
     SANDBOX_BASELINE_BLOCKS,
     assert_protocol_clean_stdout,
     find_block_by_content,
+    launch_stdio_server,
 )
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
@@ -22,6 +23,7 @@ REQUIRED_TOOLS = {
     "block_append",
     "block_update",
     "block_delete",
+    "journal_today",
     "move_block",
     "delete_page",
     "rename_page",
@@ -231,6 +233,37 @@ async def test_mcp_move_block_round_trip_uses_isolated_graph(
             assert_protocol_clean_stdout(handle.stderr_text)
     finally:
         await cleanup_lifecycle_page_fixture(live_client, page_name)
+
+
+async def test_mcp_journal_today_round_trip_uses_isolated_graph(
+    live_client,
+    journal_page_factory,
+    cleanup_journal_page_fixture,
+    isolated_graph_env,
+    monkeypatch,
+):
+    page_name = journal_page_factory()
+    monkeypatch.setenv("LOGSEQ_MCP_TEST_TODAY", page_name)
+    await cleanup_journal_page_fixture(live_client, page_name)
+
+    try:
+        async with launch_stdio_server(isolated_graph_env) as handle:
+            health_payload = _tool_payload(await handle.session.call_tool("health"))
+            assert health_payload["graph"] == isolated_graph_env.graph_name
+
+            journal_payload = _tool_payload(await handle.session.call_tool("journal_today"))
+            assert journal_payload["created"] is True
+            assert journal_payload["page"]["name"] == page_name
+            assert journal_payload["page"]["journal"] is True
+            assert journal_payload["block_count"] == 0
+
+            page_payload = _tool_payload(await handle.session.call_tool("get_page", {"name": page_name}))
+            assert page_payload["page"]["name"] == page_name
+            assert page_payload["page"]["journal"] is True
+            assert page_payload["block_count"] == 0
+            assert_protocol_clean_stdout(handle.stderr_text)
+    finally:
+        await cleanup_journal_page_fixture(live_client, page_name)
 
 
 async def test_server_keeps_logs_off_stdout(mcp_session, isolated_graph_env):
