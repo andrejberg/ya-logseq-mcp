@@ -8,7 +8,7 @@ import pytest
 from logseq_mcp.server import AppContext
 from logseq_mcp.tools.core import health
 from logseq_mcp.tools.write import block_append, block_delete, block_update
-from tests.integration.conftest import SANDBOX_BASELINE_BLOCKS, find_block_by_content
+from tests.integration.conftest import LIFECYCLE_PAGE_PREFIX, SANDBOX_BASELINE_BLOCKS, find_block_by_content
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
 
@@ -124,3 +124,107 @@ async def test_write_tools_use_sandbox_page_only(
         assert find_block_by_content(sandbox_after, baseline) is not None
 
     assert parity_after == parity_before
+
+
+async def test_delete_page_uses_disposable_target(
+    live_client,
+    isolated_graph_env,
+    assert_isolated_graph,
+    seed_fixture_graph,
+    lifecycle_page_factory,
+    ensure_lifecycle_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    fixture_pages = await seed_fixture_graph(live_client)
+    page_name = lifecycle_page_factory("Delete Target")
+
+    try:
+        assert page_name not in {fixture_pages["parity_page"], fixture_pages["sandbox_page"]}
+        assert page_name.startswith(LIFECYCLE_PAGE_PREFIX)
+
+        await ensure_lifecycle_page_fixture(
+            live_client,
+            page_name,
+            ["Phase 05 lifecycle delete root"],
+        )
+        assert await live_client._call("logseq.Editor.getPage", page_name) is not None
+
+        await live_client._call("logseq.Editor.deletePage", page_name)
+
+        assert await live_client._call("logseq.Editor.getPage", page_name) is None
+        assert await live_client._call("logseq.Editor.getPage", fixture_pages["parity_page"]) is not None
+        assert await live_client._call("logseq.Editor.getPage", fixture_pages["sandbox_page"]) is not None
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)
+
+
+async def test_rename_page_uses_disposable_target(
+    live_client,
+    isolated_graph_env,
+    assert_isolated_graph,
+    seed_fixture_graph,
+    lifecycle_page_factory,
+    ensure_lifecycle_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    fixture_pages = await seed_fixture_graph(live_client)
+    source_name = lifecycle_page_factory("Rename Source")
+    target_name = lifecycle_page_factory("Rename Target")
+
+    try:
+        assert source_name not in {fixture_pages["parity_page"], fixture_pages["sandbox_page"]}
+        assert target_name not in {fixture_pages["parity_page"], fixture_pages["sandbox_page"]}
+        assert source_name != target_name
+        assert await live_client._call("logseq.Editor.getPage", target_name) is None
+
+        await ensure_lifecycle_page_fixture(
+            live_client,
+            source_name,
+            ["Phase 05 lifecycle rename root"],
+        )
+
+        await live_client._call("logseq.Editor.renamePage", source_name, target_name)
+
+        assert await live_client._call("logseq.Editor.getPage", source_name) is None
+        renamed = await live_client._call("logseq.Editor.getPage", target_name)
+        assert isinstance(renamed, dict)
+        assert isinstance(renamed.get("name"), str)
+        assert renamed["name"].casefold() == target_name.casefold()
+        if isinstance(renamed.get("original-name"), str):
+            assert renamed["original-name"] == target_name
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, source_name)
+        await cleanup_lifecycle_page_fixture(live_client, target_name)
+
+
+async def test_namespaced_lifecycle_pages_round_trip(
+    live_client,
+    assert_isolated_graph,
+    lifecycle_page_factory,
+    ensure_lifecycle_page_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    page_name = lifecycle_page_factory("Namespaced Target", namespace="Phase 05 Namespace")
+
+    try:
+        page = await ensure_lifecycle_page_fixture(
+            live_client,
+            page_name,
+            ["Phase 05 lifecycle namespace root"],
+        )
+        resolved = await live_client._call("logseq.Editor.getPage", page_name)
+
+        assert isinstance(page.get("name"), str)
+        assert page["name"].casefold() == page_name.casefold()
+        if isinstance(page.get("original-name"), str):
+            assert page["original-name"] == page_name
+        assert isinstance(resolved, dict)
+        assert isinstance(resolved.get("name"), str)
+        assert resolved["name"].casefold() == page_name.casefold()
+        if isinstance(resolved.get("original-name"), str):
+            assert resolved["original-name"] == page_name
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, page_name)

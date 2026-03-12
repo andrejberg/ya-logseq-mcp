@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import UTC, datetime
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryFile
 from typing import AsyncIterator, Awaitable, Callable
+from uuid import uuid4
 
 import pytest
 import pytest_asyncio
@@ -22,6 +24,7 @@ SANDBOX_BASELINE_BLOCKS = [
     "Sandbox baseline",
     "This page is reserved for Phase 4 live mutation tests.",
 ]
+LIFECYCLE_PAGE_PREFIX = "Phase 05 Lifecycle"
 FIXTURE_ROOT = Path(__file__).resolve().parent.parent / "fixtures" / "graph"
 MCP_CONFIG_ENV = "WORKSPACE_MCP_CONFIG"
 MCP_CONFIG_DEFAULT = (Path.home() / "Workspace" / ".mcp.json").resolve()
@@ -238,6 +241,65 @@ async def _seed_fixture_graph(client: LogseqClient, settings: IsolatedGraphEnv) 
     return {"parity_page": settings.parity_page, "sandbox_page": settings.sandbox_page}
 
 
+def make_lifecycle_page_name(label: str, namespace: str | None = None) -> str:
+    normalized_label = "-".join(label.strip().split())
+    if not normalized_label:
+        pytest.fail("Lifecycle page label must be a non-empty string")
+
+    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
+    suffix = uuid4().hex[:8]
+    base_name = f"{LIFECYCLE_PAGE_PREFIX} {normalized_label} {timestamp}-{suffix}"
+    if namespace:
+        return f"{namespace}/{base_name}"
+    return base_name
+
+
+async def ensure_lifecycle_page(
+    client: LogseqClient,
+    page_name: str,
+    blocks: list[str] | None = None,
+) -> dict:
+    page = await _get_page_or_none(client, page_name)
+    if page is None:
+        created = await client._call(
+            "logseq.Editor.createPage",
+            page_name,
+            {},
+            {"createFirstBlock": False},
+        )
+        if not isinstance(created, dict):
+            pytest.fail(f"Failed to create lifecycle page '{page_name}'")
+
+    if blocks:
+        if page is not None:
+            await _reset_page_blocks(client, page_name)
+        for content in blocks:
+            created = await client._call(
+                "logseq.Editor.appendBlockInPage",
+                page_name,
+                content,
+                {},
+            )
+            if not isinstance(created, dict) or not isinstance(created.get("uuid"), str):
+                pytest.fail(f"Failed to seed lifecycle block '{content}' on '{page_name}'")
+
+    page = await _get_page_or_none(client, page_name)
+    if page is None:
+        pytest.fail(f"Lifecycle page did not resolve after setup: '{page_name}'")
+    return page
+
+
+async def cleanup_lifecycle_page(client: LogseqClient, page_name: str) -> None:
+    page = await _get_page_or_none(client, page_name)
+    if page is None:
+        return
+
+    await client._call("logseq.Editor.deletePage", page_name)
+    deleted = await _get_page_or_none(client, page_name)
+    if deleted is not None:
+        pytest.fail(f"Lifecycle page still resolves after cleanup: '{page_name}'")
+
+
 def _build_stdio_env(settings: IsolatedGraphEnv) -> dict[str, str]:
     env = os.environ.copy()
     env["LOGSEQ_API_URL"] = settings.api_url
@@ -357,6 +419,41 @@ def seed_fixture_graph(
 ) -> Callable[[LogseqClient], Awaitable[dict[str, str]]]:
     async def _runner(client: LogseqClient) -> dict[str, str]:
         return await _seed_fixture_graph(client, isolated_graph_env)
+
+    return _runner
+
+
+@pytest.fixture
+def lifecycle_page_factory(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[str], str]:
+    def _runner(label: str, namespace: str | None = None) -> str:
+        page_name = make_lifecycle_page_name(label, namespace)
+        if page_name in {isolated_graph_env.parity_page, isolated_graph_env.sandbox_page}:
+            pytest.fail(f"Lifecycle page factory produced a reserved fixture page: {page_name}")
+        return page_name
+
+    return _runner
+
+
+@pytest.fixture
+def ensure_lifecycle_page_fixture(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient, str, list[str] | None], Awaitable[dict]]:
+    async def _runner(client: LogseqClient, page_name: str, blocks: list[str] | None = None) -> dict:
+        await _assert_isolated_graph(client, isolated_graph_env)
+        return await ensure_lifecycle_page(client, page_name, blocks)
+
+    return _runner
+
+
+@pytest.fixture
+def cleanup_lifecycle_page_fixture(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient, str], Awaitable[None]]:
+    async def _runner(client: LogseqClient, page_name: str) -> None:
+        await _assert_isolated_graph(client, isolated_graph_env)
+        await cleanup_lifecycle_page(client, page_name)
 
     return _runner
 
