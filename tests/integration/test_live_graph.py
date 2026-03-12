@@ -13,6 +13,7 @@ from logseq_mcp.tools.write import (
     block_update,
     delete_page,
     journal_append,
+    journal_range,
     journal_today,
     move_block,
     rename_page,
@@ -514,3 +515,70 @@ async def test_journal_append_preserves_nested_blocks_for_date(
         assert find_block_by_content(readback_child.get("children", []), "Phase 06 journal grandchild") is not None
     finally:
         await cleanup_journal_page_fixture(live_client, page_name)
+
+
+async def test_journal_range_returns_inclusive_existing_entries_only(
+    live_client,
+    assert_isolated_graph,
+    journal_append_date_factory,
+    cleanup_journal_page_fixture,
+):
+    """Live: journal_range returns only existing journal pages in the requested inclusive window."""
+    await assert_isolated_graph(live_client)
+
+    # Use far-future offsets (+410/+411) to stay isolated from existing phase fixtures
+    start_page = journal_append_date_factory(410)
+    end_page = journal_append_date_factory(411)
+
+    # +411 day is inside the range; +409 day is outside (not seeded, not returned)
+    await cleanup_journal_page_fixture(live_client, start_page)
+    await cleanup_journal_page_fixture(live_client, end_page)
+
+    try:
+        # Seed start_page only — end_page intentionally absent to verify sparse skip
+        await journal_append(
+            _make_ctx(live_client),
+            date=start_page,
+            blocks=[{"content": "Phase 07 range start block"}],
+        )
+
+        result = json.loads(
+            await journal_range(_make_ctx(live_client), start_date=start_page, end_date=end_page)
+        )
+
+        assert result["start_date"] == start_page
+        assert result["end_date"] == end_page
+        assert result["days"] == 2
+        # Only start_page seeded — end_page absent so entry_count must be 1
+        assert result["entry_count"] == 1
+        assert len(result["entries"]) == 1
+
+        entry = result["entries"][0]
+        assert entry["page"]["name"] == start_page
+        assert entry["page"]["journal"] is True
+        assert entry["block_count"] >= 1
+        assert find_block_by_content(entry["blocks"], "Phase 07 range start block") is not None
+    finally:
+        await cleanup_journal_page_fixture(live_client, start_page)
+        await cleanup_journal_page_fixture(live_client, end_page)
+
+
+async def test_journal_range_reversed_range_fails_on_live_graph(
+    live_client,
+    assert_isolated_graph,
+    journal_append_date_factory,
+):
+    """Live: reversed start/end dates raise an explicit McpError before any Logseq API call."""
+    from mcp import McpError
+
+    await assert_isolated_graph(live_client)
+
+    # Use far-future offsets (+412/+413) for the reversed-range test
+    later_page = journal_append_date_factory(413)
+    earlier_page = journal_append_date_factory(412)
+
+    # McpError fires before any getPage call, so no live_client seeding needed
+    with pytest.raises(McpError) as exc_info:
+        await journal_range(_make_ctx(live_client), start_date=later_page, end_date=earlier_page)
+
+    assert "start_date must be on or before end_date" in exc_info.value.error.message
