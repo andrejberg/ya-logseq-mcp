@@ -79,4 +79,4 @@ Plans:
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
 | 6. Block Moves and Journal Writes | v1.1 | 5/5 | Complete | 2026-03-12 |
-| 7. Journal Range and Milestone Validation | 1/3 | In Progress|  | - |
+| 7. Journal Range and Milestone Validation | 2/3 | In Progress|  | - |

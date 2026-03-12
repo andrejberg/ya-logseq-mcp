@@ -4,16 +4,16 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 7
 current_phase_name: journal range and milestone validation
-current_plan: 1
-status: in-progress
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-12T21:54:39Z"
+current_plan: 2
+status: executing
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-12T21:58:38.376Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
   percent: 65
 ---
 
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Current Phase:** 7
 **Current Phase Name:** journal range and milestone validation
 **Total Phases:** 3
-**Current Plan:** 1 (completed)
+**Current Plan:** 2
 **Total Plans in Phase:** 5
-**Status:** In progress
+**Status:** Ready to execute
 **Last Activity:** 2026-03-12
 
 Progress: [██████▌░░░] 65%
@@ -78,6 +78,7 @@ Progress: [██████▌░░░] 65%
 | Phase 06-block-moves-and-journal-writes P03 | 6min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P04 | 8min | 2 tasks | 5 files |
 | Phase 07-journal-range-and-milestone-validation P01 | 8min | 2 tasks | 2 files |
+| Phase 07-journal-range-and-milestone-validation P02 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -140,6 +141,9 @@ Recent decisions affecting current work:
 - [Phase 07-journal-range]: _parse_journal_date accepts a field keyword arg so McpError messages distinguish invalid start_date from invalid end_date
 - [Phase 07-journal-range]: Reversed range is an explicit McpError, not silent empty result, to surface caller bugs
 - [Phase 07-journal-range]: Non-journal page hit during range lookup raises McpError to preserve ISO date contract integrity
+- [Phase 07-journal-range-and-milestone-validation]: journal_range added to both registry and stdio REQUIRED_TOOLS assertions to keep all tool-surface checks in sync
+- [Phase 07-journal-range-and-milestone-validation]: Two far-future offsets (+400/+401 for range; +402/+403 for reversed-range) keep new tests isolated from existing journal_append fixtures
+- [Phase 07-journal-range-and-milestone-validation]: Reversed-range test requires no live_client since McpError fires before any Logseq API call
 
 ### Pending Todos
 
@@ -152,6 +156,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T21:54:39Z
-**Stopped At:** Completed 07-01-PLAN.md
+Last session: 2026-03-12T21:58:38.374Z
+**Stopped At:** Completed 07-02-PLAN.md
 **Resume File:** None
