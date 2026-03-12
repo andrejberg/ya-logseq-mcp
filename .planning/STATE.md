@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 4
 current_phase_name: integration and swap
 current_plan: 3
-status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-10T09:12:35.864Z"
-last_activity: 2026-03-10
+status: complete
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-03-12T12:00:00Z"
+last_activity: 2026-03-12
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 11
-  percent: 92
+  completed_plans: 12
+  percent: 100
 ---
 
 # Project State
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 4 Plan 02 complete; Phase 4 Plan 03 is next
+**Current focus:** Phase 4 complete; rollout validation passed and the milestone is ready for archive
 
 ## Current Position
 
@@ -33,10 +33,10 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 **Total Phases:** 4
 **Current Plan:** 3
 **Total Plans in Phase:** 3
-**Status:** Ready to execute
-**Last Activity:** 2026-03-10
+**Status:** Complete
+**Last Activity:** 2026-03-12
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -52,11 +52,11 @@ Progress: [█████████░] 92%
 | Phase 1 | 3 | 5min | 2min |
 | Phase 2 | 3 | 10min | 3min |
 | Phase 3 | 2 | 13min | 7min |
-| Phase 4 | 2 | 36min | 18min |
+| Phase 4 | 3 | 44min | 15min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 7min, 10min, 26min
-- Trend: Increasing
+- Last 5 plans: 6min, 7min, 10min, 26min, 8min
+- Trend: Stable
 
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 2min | 2 tasks | 7 files |
@@ -70,6 +70,7 @@ Progress: [█████████░] 92%
 | Phase 03-write-tools P03 | 2min | 2 tasks | 4 files |
 | Phase 04-integration-and-swap P01 | 10min | 2 tasks | 8 files |
 | Phase 04-integration-and-swap P02 | 26min | 2 tasks | 2 files |
+| Phase 04-integration-and-swap P03 | 8min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - [Phase 04-integration-and-swap]: MCP tool assertions parse the real structuredContent.result wrapper emitted by FastMCP rather than assuming raw JSON text only.
 - [Phase 04-integration-and-swap]: Live graph safety stays enforced by reusing Plan 01 fixture seeding before any MCP write call instead of inventing a second isolation contract.
 - [Phase 04-integration-and-swap]: The stdio harness launches uv run python -m logseq_mcp directly so transport coverage matches the production Claude entrypoint.
+- [Phase 04-integration-and-swap]: Parity helpers must decode both FastMCP structuredContent and raw text JSON because graphthulhu returns plain text payloads.
+- [Phase 04-integration-and-swap]: PageEntity coerces namespace page refs like {id: N} so `list_pages` survives daily-driver graphs with namespaced pages.
+- [Phase 04-integration-and-swap]: Phase 4 sign-off is recorded only after parity tests, isolated smoke validation, and daily-driver read-only validation all pass with graphthulhu still available as fallback.
 
 ### Pending Todos
 
@@ -119,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T09:12:10.999Z
-**Stopped At:** Completed 04-02-PLAN.md
+Last session: 2026-03-12T12:00:00.000Z
+**Stopped At:** Completed 04-03-PLAN.md
 **Resume File:** None

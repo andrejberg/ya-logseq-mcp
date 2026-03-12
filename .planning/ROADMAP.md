@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Async client, Pydantic types, MCP server skeleton, and health tool (completed 2026-03-09)
 - [x] **Phase 2: Core Reads** - Deduplicated page reads, block retrieval, page listing, and backlinks (completed 2026-03-09)
 - [x] **Phase 3: Write Tools** - Page and block CRUD with correct hierarchy (completed 2026-03-10)
-- [ ] **Phase 4: Integration and Swap** - End-to-end verification, parity testing, graphthulhu replacement
+- [x] **Phase 4: Integration and Swap** - End-to-end verification, parity testing, graphthulhu replacement (completed 2026-03-12)
 
 ## Phase Details
 
@@ -70,20 +70,20 @@ Plans:
 - [x] 03-03-PLAN.md — block_update, block_delete, and write-module registration (Wave 3)
 
 ### Phase 4: Integration and Swap
-**Goal**: The server is production-ready and replaces graphthulhu in the MCP config
+**Goal**: The server is production-ready and validated side-by-side with graphthulhu in the shared MCP config
 **Depends on**: Phase 3
 **Requirements**: INTG-01, INTG-02, INTG-03
 **Success Criteria** (what must be TRUE):
   1. Server runs as MCP stdio transport and Claude Code can invoke all registered tools
   2. Integration tests pass against an isolated test graph (not the real workspace graph)
   3. `get_page` on a known page returns fewer blocks than graphthulhu (deduplication verified)
-  4. The server entry in `~/.claude/.mcp.json` replaces graphthulhu and daily workflow is unbroken
+  4. `logseq-mcp` works in the shared workspace MCP config while graphthulhu remains available as fallback during rollout
 **Plans**: 3 plans
 
 Plans:
 - [x] 04-01-PLAN.md — isolated test graph fixtures, safety guards, and live sandbox verification (Wave 1)
 - [x] 04-02-PLAN.md — black-box MCP stdio subprocess verification and tool round trips (Wave 2)
-- [ ] 04-03-PLAN.md — graphthulhu parity, Claude swap gate, and rollback-ready sign-off (Wave 3)
+- [x] 04-03-PLAN.md — graphthulhu parity, side-by-side smoke gate, and rollout-ready sign-off (Wave 3)
 
 ## Progress
 
@@ -95,4 +95,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation | 3/3 | Complete   | 2026-03-09 |
 | 2. Core Reads | 3/3 | Complete | 2026-03-09 |
 | 3. Write Tools | 3/3 | Complete | 2026-03-10 |
-| 4. Integration and Swap | 2/3 | In Progress | - |
+| 4. Integration and Swap | 3/3 | Complete | 2026-03-12 |

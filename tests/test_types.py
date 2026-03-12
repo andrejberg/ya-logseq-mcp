@@ -19,6 +19,19 @@ def test_pageref_from_int():
     assert p.name == ""
 
 
+def test_pageentity_namespace_ref_coerces_to_string():
+    page = PageEntity.model_validate(
+        {
+            "id": 1,
+            "uuid": "page-1",
+            "name": "training/iteration-1",
+            "original-name": "training/iteration-1",
+            "namespace": {"id": 2393},
+        }
+    )
+    assert page.namespace == ""
+
+
 def test_blockentity_compact_children_stripped():
     be = BlockEntity.model_validate({"uuid": "abc", "children": [["uuid", "somevalue"]]})
     assert be.children == []

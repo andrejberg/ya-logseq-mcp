@@ -46,6 +46,22 @@ class PageEntity(BaseModel):
     properties: dict = Field(default_factory=dict)
     namespace: str = ""
 
+    @model_validator(mode="before")
+    @classmethod
+    def coerce_namespace_ref(cls, v: Any) -> Any:
+        """Accept namespace values returned as page refs like {'id': N}."""
+        if not isinstance(v, dict):
+            return v
+
+        namespace = v.get("namespace")
+        if isinstance(namespace, dict):
+            v = dict(v)
+            v["namespace"] = namespace.get("name", "")
+        elif isinstance(namespace, int):
+            v = dict(v)
+            v["namespace"] = ""
+        return v
+
 
 class BlockEntity(BaseModel):
     """A Logseq block, as returned by getPageBlocksTree / getBlock."""

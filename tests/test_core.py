@@ -242,6 +242,36 @@ async def test_list_pages_namespace_filter(token_env):
     assert all(n.startswith("projects/") for n in names), f"All names must start with 'projects/': {names}"
 
 
+async def test_list_pages_tolerates_namespace_page_refs(token_env):
+    """list_pages must not fail when Logseq returns namespace as a page ref object."""
+    from logseq_mcp.tools.core import list_pages
+
+    fake_pages = [
+        {
+            "id": 2390,
+            "uuid": "u-namespace",
+            "name": "hls__20240820_research_data_policy_sfb1552_v1/1_1760532126520_0",
+            "original-name": "hls__20240820_research_data_policy_sfb1552_v1/1_1760532126520_0",
+            "namespace": {"id": 2393},
+        },
+        {"id": 3, "uuid": "u3", "name": "daily", "original-name": "daily"},
+    ]
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getAllPages":
+            return fake_pages
+        return None
+
+    mock_ctx = _make_ctx(fake_call)
+    result = await list_pages(mock_ctx, include_journals=True, limit=10)
+    data = json.loads(result)
+
+    assert [page["name"] for page in data] == [
+        "daily",
+        "hls__20240820_research_data_policy_sfb1552_v1/1_1760532126520_0",
+    ]
+
+
 # ---------------------------------------------------------------------------
 # READ-06: get_references parses linked-references response
 # ---------------------------------------------------------------------------
