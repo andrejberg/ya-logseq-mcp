@@ -18,11 +18,16 @@ def test_tool_registered(token_env):
     tool_names = list(mcp._tool_manager._tools.keys())
     expected = {
         "health",
+        "get_page",
+        "get_block",
+        "list_pages",
+        "get_references",
         "page_create",
         "block_append",
         "block_update",
         "block_delete",
         "journal_today",
+        "journal_append",
         "move_block",
         "delete_page",
         "rename_page",

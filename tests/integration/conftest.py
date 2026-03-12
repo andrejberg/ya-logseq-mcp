@@ -520,6 +520,14 @@ def journal_page_factory() -> Callable[[int], str]:
 
 
 @pytest.fixture
+def journal_append_date_factory() -> Callable[[int], str]:
+    def _runner(days_from_today: int = 30) -> str:
+        return make_journal_page_name(days_from_today)
+
+    return _runner
+
+
+@pytest.fixture
 def ensure_lifecycle_page_fixture(
     isolated_graph_env: IsolatedGraphEnv,
 ) -> Callable[[LogseqClient, str, list[str] | None], Awaitable[dict]]:

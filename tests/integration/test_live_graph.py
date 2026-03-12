@@ -12,6 +12,7 @@ from logseq_mcp.tools.write import (
     block_delete,
     block_update,
     delete_page,
+    journal_append,
     journal_today,
     move_block,
     rename_page,
@@ -412,5 +413,60 @@ async def test_journal_today_creates_missing_journal_page(
         assert isinstance(readback_page, dict)
         assert readback_page.get("name") == page_name
         assert readback_page.get("journal?") is True
+    finally:
+        await cleanup_journal_page_fixture(live_client, page_name)
+
+
+async def test_journal_append_preserves_nested_blocks_for_date(
+    live_client,
+    assert_isolated_graph,
+    journal_append_date_factory,
+    cleanup_journal_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    page_name = journal_append_date_factory(31)
+    await cleanup_journal_page_fixture(live_client, page_name)
+
+    try:
+        payload = json.loads(
+            await journal_append(
+                _make_ctx(live_client),
+                date=page_name,
+                blocks=[
+                    {
+                        "content": "Phase 06 journal root",
+                        "children": [
+                            {
+                                "content": "Phase 06 journal child",
+                                "children": [{"content": "Phase 06 journal grandchild"}],
+                            }
+                        ],
+                    }
+                ],
+            )
+        )
+        readback_page = await live_client._call("logseq.Editor.getPage", page_name)
+        readback_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", page_name)
+
+        assert payload["page"] == page_name
+        assert payload["appended"] == 3
+        assert payload["block_count"] == 3
+        assert isinstance(readback_page, dict)
+        assert readback_page.get("name") == page_name
+        assert readback_page.get("journal?") is True
+        assert isinstance(readback_blocks, list)
+
+        root = find_block_by_content(payload["blocks"], "Phase 06 journal root")
+        assert root is not None
+        child = find_block_by_content(root.get("children", []), "Phase 06 journal child")
+        assert child is not None
+        grandchild = find_block_by_content(child.get("children", []), "Phase 06 journal grandchild")
+        assert grandchild is not None
+
+        readback_root = find_block_by_content(readback_blocks, "Phase 06 journal root")
+        assert readback_root is not None
+        readback_child = find_block_by_content(readback_root.get("children", []), "Phase 06 journal child")
+        assert readback_child is not None
+        assert find_block_by_content(readback_child.get("children", []), "Phase 06 journal grandchild") is not None
     finally:
         await cleanup_journal_page_fixture(live_client, page_name)
