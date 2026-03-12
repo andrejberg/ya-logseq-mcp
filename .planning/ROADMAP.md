@@ -44,7 +44,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 06-01: `move_block` with subtree verification
+- [x] 06-01: `move_block` with subtree verification
 - [ ] 06-02: journal helpers and `journal_today`
 - [ ] 06-03: `journal_append`
 
@@ -76,5 +76,5 @@ Plans:
 | 3. Write Tools | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
-| 6. Block Moves and Journal Writes | v1.1 | 0/3 | Not started | - |
+| 6. Block Moves and Journal Writes | v1.1 | 1/3 | In Progress | 2026-03-12 |
 | 7. Journal Range and Milestone Validation | v1.1 | 0/3 | Not started | - |

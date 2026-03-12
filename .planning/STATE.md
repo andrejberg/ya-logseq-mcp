@@ -4,17 +4,17 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
-current_plan: Not started
-status: planning
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-12T13:38:17.957Z"
+current_plan: 02
+status: ready_to_execute
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-12T14:04:51Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 93
+  total_plans: 3
+  completed_plans: 3
+  percent: 94
 ---
 
 # Project State
@@ -24,26 +24,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 5 lifecycle writes are complete; Phase 6 block moves and journal writes are next
+**Current focus:** Phase 6 move_block is complete; journal helpers and journal append are next
 
 ## Current Position
 
 **Current Phase:** 6
 **Current Phase Name:** block moves and journal writes
 **Total Phases:** 7
-**Current Plan:** Not started
-**Total Plans in Phase:** 2
-**Status:** Ready to plan
+**Current Plan:** 02
+**Total Plans in Phase:** 3
+**Status:** Ready to execute
 **Last Activity:** 2026-03-12
 
-Progress: [█████████░] 93%
+Progress: [█████████░] 94%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 6min
-- Total execution time: 64min
+- Total plans completed: 12
+- Average duration: 7min
+- Total execution time: 82min
 
 **By Phase:**
 
@@ -55,7 +55,7 @@ Progress: [█████████░] 93%
 | Phase 4 | 3 | 44min | 15min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 7min, 10min, 26min, 8min
+- Last 5 plans: 7min, 10min, 26min, 8min, 18min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -73,6 +73,7 @@ Progress: [█████████░] 93%
 | Phase 04-integration-and-swap P03 | 8min | 2 tasks | 6 files |
 | Phase 05 P01 | 5min | 2 tasks | 4 files |
 | Phase 05 P02 | 4min | 2 tasks | 5 files |
+| Phase 06 P01 | 18min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 05]: delete_page and rename_page only report success after follow-up getPage verification rather than trusting lifecycle RPC payloads
 - [Phase 05]: The existing bottom-of-file write-module import in server.py remains the lifecycle tool registration path because decorated handlers register automatically
 - [Phase 05]: Namespaced lifecycle transport tests use disposable pages and public MCP tools to keep destructive verification isolated
+- [Phase 06-block-moves-and-journal-writes]: `move_block` keeps the public `before`/`after`/`child` API but maps those positions to Logseq's observed `moveBlock` opts contract (`before` => `{before: true}`, `child` => `{children: true}`, `after` => `{}`).
+- [Phase 06-block-moves-and-journal-writes]: Move success is determined from `getPageBlocksTree` readback, proving both relative placement and subtree preservation instead of trusting the `moveBlock` return payload.
+- [Phase 06-block-moves-and-journal-writes]: Disposable Phase 6 move pages extend the isolated graph harness so destructive move tests never touch the Phase 4 parity or sandbox fixtures.
 
 ### Pending Todos
 
@@ -132,6 +136,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T13:31:31.972Z
-**Stopped At:** Completed 05-02-PLAN.md
+Last session: 2026-03-12T14:04:51Z
+**Stopped At:** Completed 06-01-PLAN.md
 **Resume File:** None
