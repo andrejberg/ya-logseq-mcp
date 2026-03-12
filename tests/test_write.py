@@ -450,7 +450,7 @@ async def test_block_delete_missing_uuid_raises_explicit_error(token_env):
 
 
 async def test_delete_page_removes_page_from_followup_reads(token_env):
-    from logseq_mcp.tools.write import _verify_page_absent, _verify_page_present
+    from logseq_mcp.tools.write import delete_page
 
     calls = []
 
@@ -470,35 +470,31 @@ async def test_delete_page_removes_page_from_followup_reads(token_env):
 
     client = AsyncMock()
     client._call = fake_call
+    mock_ctx = _make_ctx(client)
 
-    page = await _verify_page_present(client, "Phase 05 Lifecycle/Delete Me")
-    assert page.name == "Phase 05 Lifecycle/Delete Me"
-
-    await _verify_page_absent(client, "Phase 05 Lifecycle/Delete Me")
+    payload = json.loads(await delete_page(mock_ctx, "Phase 05 Lifecycle/Delete Me"))
 
     assert [method for method, _ in calls] == [
         "logseq.Editor.getPage",
+        "logseq.Editor.deletePage",
         "logseq.Editor.getPage",
     ]
+    assert payload == {"ok": True, "name": "Phase 05 Lifecycle/Delete Me"}
 
 
 async def test_delete_page_missing_page_raises_explicit_error(token_env):
-    from logseq_mcp.tools.write import _verify_page_present
+    from logseq_mcp.tools.write import delete_page
 
     client = AsyncMock()
     client._call = AsyncMock(return_value=None)
+    mock_ctx = _make_ctx(client)
 
     with pytest.raises(McpError, match="page not found: Missing Lifecycle Page"):
-        await _verify_page_present(client, "Missing Lifecycle Page")
+        await delete_page(mock_ctx, "Missing Lifecycle Page")
 
 
 async def test_rename_page_moves_resolution_to_new_name(token_env):
-    from logseq_mcp.tools.write import (
-        _validate_rename_target,
-        _verify_page_absent,
-        _verify_page_present,
-        _verify_rename_target_available,
-    )
+    from logseq_mcp.tools.write import rename_page
 
     calls = []
 
@@ -532,21 +528,11 @@ async def test_rename_page_moves_resolution_to_new_name(token_env):
 
     client = AsyncMock()
     client._call = fake_call
+    mock_ctx = _make_ctx(client)
 
-    source = await _verify_page_present(client, "Phase 05 Lifecycle/Rename Source")
-    assert source.name == "Phase 05 Lifecycle/Rename Source"
-    _validate_rename_target("Phase 05 Lifecycle/Rename Source", "Phase 05 Lifecycle/Rename Target")
-    await _verify_rename_target_available(client, "Phase 05 Lifecycle/Rename Target")
-
-    await client._call(
-        "logseq.Editor.renamePage",
-        "Phase 05 Lifecycle/Rename Source",
-        "Phase 05 Lifecycle/Rename Target",
+    payload = json.loads(
+        await rename_page(mock_ctx, "Phase 05 Lifecycle/Rename Source", "Phase 05 Lifecycle/Rename Target")
     )
-    await _verify_page_absent(client, "Phase 05 Lifecycle/Rename Source")
-    renamed = await _verify_page_present(client, "Phase 05 Lifecycle/Rename Target")
-
-    assert renamed.name == "Phase 05 Lifecycle/Rename Target"
     assert [method for method, _ in calls] == [
         "logseq.Editor.getPage",
         "logseq.Editor.getPage",
@@ -554,14 +540,15 @@ async def test_rename_page_moves_resolution_to_new_name(token_env):
         "logseq.Editor.getPage",
         "logseq.Editor.getPage",
     ]
+    assert payload == {
+        "ok": True,
+        "old_name": "Phase 05 Lifecycle/Rename Source",
+        "new_name": "Phase 05 Lifecycle/Rename Target",
+    }
 
 
 async def test_rename_page_existing_destination_raises_explicit_error(token_env):
-    from logseq_mcp.tools.write import (
-        _validate_rename_target,
-        _verify_page_present,
-        _verify_rename_target_available,
-    )
+    from logseq_mcp.tools.write import rename_page
 
     calls = []
 
@@ -590,12 +577,10 @@ async def test_rename_page_existing_destination_raises_explicit_error(token_env)
 
     client = AsyncMock()
     client._call = fake_call
-
-    await _verify_page_present(client, "Phase 05 Lifecycle/Rename Source")
-    _validate_rename_target("Phase 05 Lifecycle/Rename Source", "Phase 05 Lifecycle/Rename Target")
+    mock_ctx = _make_ctx(client)
 
     with pytest.raises(McpError, match="page already exists: Phase 05 Lifecycle/Rename Target"):
-        await _verify_rename_target_available(client, "Phase 05 Lifecycle/Rename Target")
+        await rename_page(mock_ctx, "Phase 05 Lifecycle/Rename Source", "Phase 05 Lifecycle/Rename Target")
 
     assert [method for method, _ in calls] == [
         "logseq.Editor.getPage",
@@ -604,52 +589,78 @@ async def test_rename_page_existing_destination_raises_explicit_error(token_env)
 
 
 async def test_rename_page_missing_source_raises_explicit_error(token_env):
-    from logseq_mcp.tools.write import _verify_page_present
+    from logseq_mcp.tools.write import rename_page
 
     client = AsyncMock()
     client._call = AsyncMock(return_value=None)
+    mock_ctx = _make_ctx(client)
 
     with pytest.raises(McpError, match="page not found: Missing Rename Source"):
-        await _verify_page_present(client, "Missing Rename Source")
+        await rename_page(mock_ctx, "Missing Rename Source", "Any Target")
+
+
+async def test_rename_page_same_name_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import rename_page
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="new_name must differ from old_name"):
+        await rename_page(mock_ctx, "Phase 05 Lifecycle/Same", "Phase 05 Lifecycle/Same")
+
+    client._call.assert_not_called()
 
 
 async def test_lifecycle_tools_preserve_namespaced_page_names(token_env):
-    from logseq_mcp.tools.write import (
-        _validate_rename_target,
-        _verify_page_present,
-        _verify_rename_target_available,
-    )
+    from logseq_mcp.tools.write import rename_page
 
     calls = []
 
     async def fake_call(method, *args):
         calls.append((method, args))
-        if method != "logseq.Editor.getPage":
-            return None
-        page_name = args[0]
-        if page_name == "Phase 05 Namespace/Source":
-            return {
-                "id": 20,
-                "uuid": "page-ns",
-                "name": page_name,
-                "original-name": page_name,
-                "namespace": {"id": 7},
-                "journal?": False,
-            }
-        if page_name == "Phase 05 Namespace/Renamed":
+        if method == "logseq.Editor.getPage":
+            page_name = args[0]
+            if page_name == "Phase 05 Namespace/Source":
+                if len(calls) == 1:
+                    return {
+                        "id": 20,
+                        "uuid": "page-ns",
+                        "name": page_name,
+                        "original-name": page_name,
+                        "namespace": {"id": 7},
+                        "journal?": False,
+                    }
+                return None
+            if page_name == "Phase 05 Namespace/Renamed":
+                if len(calls) == 2:
+                    return None
+                return {
+                    "id": 20,
+                    "uuid": "page-ns",
+                    "name": page_name.lower(),
+                    "original-name": page_name,
+                    "namespace": {"id": 7},
+                    "journal?": False,
+                }
+        if method == "logseq.Editor.renamePage":
             return None
         return None
 
     client = AsyncMock()
     client._call = fake_call
+    mock_ctx = _make_ctx(client)
 
-    source = await _verify_page_present(client, "Phase 05 Namespace/Source")
-    _validate_rename_target("Phase 05 Namespace/Source", "Phase 05 Namespace/Renamed")
-    await _verify_rename_target_available(client, "Phase 05 Namespace/Renamed")
+    payload = json.loads(await rename_page(mock_ctx, "Phase 05 Namespace/Source", "Phase 05 Namespace/Renamed"))
 
-    assert source.name == "Phase 05 Namespace/Source"
-    assert source.original_name == "Phase 05 Namespace/Source"
-    assert [args[0] for _, args in calls] == [
-        "Phase 05 Namespace/Source",
-        "Phase 05 Namespace/Renamed",
+    assert payload == {
+        "ok": True,
+        "old_name": "Phase 05 Namespace/Source",
+        "new_name": "Phase 05 Namespace/Renamed",
+    }
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPage",
+        "logseq.Editor.renamePage",
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPage",
     ]

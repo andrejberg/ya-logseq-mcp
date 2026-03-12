@@ -180,6 +180,14 @@ async def _verify_page_absent(client, page_name: str) -> None:
         raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page still exists after delete: {page_name}"))
 
 
+def _page_matches_name(page: PageEntity, expected_name: str) -> bool:
+    if page.name.casefold() == expected_name.casefold():
+        return True
+    if isinstance(page.original_name, str) and page.original_name == expected_name:
+        return True
+    return False
+
+
 def _validate_rename_target(old_name: str, new_name: str) -> None:
     if not isinstance(old_name, str) or not old_name.strip():
         raise McpError(ErrorData(code=INTERNAL_ERROR, message="old_name must be a non-empty string"))
@@ -193,6 +201,16 @@ async def _verify_rename_target_available(client, new_name: str) -> None:
     page = await _get_page_or_none(client, new_name)
     if page is not None:
         raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page already exists: {new_name}"))
+
+
+async def _verify_rename_readback(client, old_name: str, new_name: str) -> PageEntity:
+    await _verify_page_absent(client, old_name)
+    page = await _verify_page_present(client, new_name)
+    if not _page_matches_name(page, new_name):
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message=f"renamed page did not resolve at new name: {new_name}")
+        )
+    return page
 
 
 async def _get_page_blocks(client, page_name: str) -> list[BlockEntity]:
@@ -344,3 +362,33 @@ async def block_delete(ctx: Context, uuid: str) -> str:
     await client._call("logseq.Editor.removeBlock", uuid)
     await _verify_block_absent(client, uuid, page_name)
     return json.dumps({"ok": True, "uuid": uuid})
+
+
+@mcp.tool()
+async def delete_page(ctx: Context, name: str) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("delete_page: %s", name)
+
+    await _verify_page_present(client, name)
+    await client._call("logseq.Editor.deletePage", name)
+    await _verify_page_absent(client, name)
+
+    return json.dumps({"ok": True, "name": name})
+
+
+@mcp.tool()
+async def rename_page(ctx: Context, old_name: str, new_name: str) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("rename_page: %s -> %s", old_name, new_name)
+
+    _validate_rename_target(old_name, new_name)
+    await _verify_page_present(client, old_name)
+    await _verify_rename_target_available(client, new_name)
+    await client._call("logseq.Editor.renamePage", old_name, new_name)
+    await _verify_rename_readback(client, old_name, new_name)
+
+    return json.dumps({"ok": True, "old_name": old_name, "new_name": new_name})
