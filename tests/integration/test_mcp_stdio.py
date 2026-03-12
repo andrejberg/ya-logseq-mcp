@@ -25,6 +25,7 @@ REQUIRED_TOOLS = {
     "block_delete",
     "journal_today",
     "journal_append",
+    "journal_range",
     "move_block",
     "delete_page",
     "rename_page",
@@ -369,6 +370,79 @@ async def test_mcp_journal_append_round_trip_uses_isolated_graph(
             assert_protocol_clean_stdout(handle.stderr_text)
     finally:
         await cleanup_journal_page_fixture(live_client, page_name)
+
+
+async def test_mcp_journal_range_round_trip_uses_isolated_graph(
+    live_client,
+    journal_append_date_factory,
+    cleanup_journal_page_fixture,
+    isolated_graph_env,
+):
+    # Use two far-future disposable dates for the range window.
+    start_page = journal_append_date_factory(400)
+    end_page = journal_append_date_factory(401)
+    await cleanup_journal_page_fixture(live_client, start_page)
+    await cleanup_journal_page_fixture(live_client, end_page)
+
+    try:
+        async with launch_stdio_server(isolated_graph_env) as handle:
+            health_payload = _tool_payload(await handle.session.call_tool("health"))
+            assert health_payload["graph"] == isolated_graph_env.graph_name
+
+            # Seed both journal pages with content via MCP transport.
+            await handle.session.call_tool(
+                "journal_append",
+                {"date": start_page, "blocks": ["Phase 07 range start block"]},
+            )
+            await handle.session.call_tool(
+                "journal_append",
+                {"date": end_page, "blocks": ["Phase 07 range end block"]},
+            )
+
+            # Retrieve the inclusive range through MCP transport.
+            range_payload = _tool_payload(
+                await handle.session.call_tool(
+                    "journal_range",
+                    {"start_date": start_page, "end_date": end_page},
+                )
+            )
+            assert range_payload["start_date"] == start_page
+            assert range_payload["end_date"] == end_page
+            assert range_payload["days"] == 2
+            assert range_payload["entry_count"] == 2
+
+            entry_dates = [e["page"]["name"] for e in range_payload["entries"]]
+            assert start_page in entry_dates
+            assert end_page in entry_dates
+
+            start_entry = next(e for e in range_payload["entries"] if e["page"]["name"] == start_page)
+            end_entry = next(e for e in range_payload["entries"] if e["page"]["name"] == end_page)
+            assert find_block_by_content(start_entry["blocks"], "Phase 07 range start block") is not None
+            assert find_block_by_content(end_entry["blocks"], "Phase 07 range end block") is not None
+
+            assert_protocol_clean_stdout(handle.stderr_text)
+    finally:
+        await cleanup_journal_page_fixture(live_client, start_page)
+        await cleanup_journal_page_fixture(live_client, end_page)
+
+
+async def test_mcp_journal_range_reversed_fails_through_transport(
+    isolated_graph_env,
+    journal_append_date_factory,
+):
+    # Reversed range: end before start must surface an explicit McpError.
+    start_page = journal_append_date_factory(402)
+    end_page = journal_append_date_factory(403)
+
+    async with launch_stdio_server(isolated_graph_env) as handle:
+        result = await handle.session.call_tool(
+            "journal_range",
+            {"start_date": end_page, "end_date": start_page},
+        )
+        error_texts = [item.text for item in result.content if hasattr(item, "text")]
+        assert error_texts, f"reversed range returned no error text: {result!r}"
+        assert any("start_date must be on or before end_date" in text for text in error_texts)
+        assert_protocol_clean_stdout(handle.stderr_text)
 
 
 async def test_server_keeps_logs_off_stdout(mcp_session, isolated_graph_env):
