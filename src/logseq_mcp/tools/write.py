@@ -154,6 +154,47 @@ async def _get_page_or_error(client, page_name: str) -> PageEntity:
     return PageEntity.model_validate(raw)
 
 
+async def _get_page_or_none(client, page_name: str) -> PageEntity | None:
+    raw = await client._call("logseq.Editor.getPage", page_name)
+    if raw is None:
+        return None
+
+    try:
+        return PageEntity.model_validate(raw)
+    except ValidationError as exc:
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message=f"logseq.Editor.getPage returned an invalid response: {exc}")
+        ) from exc
+
+
+async def _verify_page_present(client, page_name: str) -> PageEntity:
+    page = await _get_page_or_none(client, page_name)
+    if page is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page not found: {page_name}"))
+    return page
+
+
+async def _verify_page_absent(client, page_name: str) -> None:
+    page = await _get_page_or_none(client, page_name)
+    if page is not None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page still exists after delete: {page_name}"))
+
+
+def _validate_rename_target(old_name: str, new_name: str) -> None:
+    if not isinstance(old_name, str) or not old_name.strip():
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message="old_name must be a non-empty string"))
+    if not isinstance(new_name, str) or not new_name.strip():
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message="new_name must be a non-empty string"))
+    if old_name == new_name:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message="new_name must differ from old_name"))
+
+
+async def _verify_rename_target_available(client, new_name: str) -> None:
+    page = await _get_page_or_none(client, new_name)
+    if page is not None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page already exists: {new_name}"))
+
+
 async def _get_page_blocks(client, page_name: str) -> list[BlockEntity]:
     raw = await client._call("logseq.Editor.getPageBlocksTree", page_name)
     if not isinstance(raw, list):
