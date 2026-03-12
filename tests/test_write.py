@@ -974,3 +974,84 @@ async def test_move_block_fails_when_readback_does_not_match_requested_position(
 
     with pytest.raises(McpError, match="move verification failed for block: move-root"):
         await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="before")
+
+
+def test_resolve_journal_page_name_accepts_iso_dates():
+    from logseq_mcp.tools.write import _resolve_journal_page_name
+
+    assert _resolve_journal_page_name("2026-03-12") == "2026-03-12"
+
+
+@pytest.mark.parametrize("value", ["2026-13-12", "2026-02-30", "03-12-2026", "not-a-date"])
+def test_resolve_journal_page_name_rejects_invalid_dates(value):
+    from logseq_mcp.tools.write import _resolve_journal_page_name
+
+    with pytest.raises(McpError, match=f"invalid journal date: {value}"):
+        _resolve_journal_page_name(value)
+
+
+def test_resolve_journal_page_name_rejects_unsupported_format_assumptions():
+    from logseq_mcp.tools.write import _resolve_journal_page_name
+
+    with pytest.raises(McpError, match="unsupported journal page title format: MMM do, yyyy"):
+        _resolve_journal_page_name("2026-03-12", page_title_format="MMM do, yyyy")
+
+
+async def test_journal_today_creates_missing_page_and_reads_back_journal_payload(token_env, monkeypatch):
+    from datetime import date
+
+    from logseq_mcp.tools import write as write_tools
+
+    calls = []
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getPage":
+            if len([call for call in calls if call[0] == "logseq.Editor.getPage"]) == 1:
+                return None
+            return {
+                "id": 30,
+                "uuid": "journal-page-uuid",
+                "name": "2026-03-12",
+                "original-name": "2026-03-12",
+                "journal?": True,
+                "journal-day": 20260312,
+            }
+        if method == "logseq.Editor.createPage":
+            return {"uuid": "journal-page-uuid", "name": "2026-03-12"}
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+    monkeypatch.setattr(write_tools, "_today_date", lambda: date(2026, 3, 12))
+
+    payload = json.loads(await write_tools.journal_today(mock_ctx))
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getPage",
+        "logseq.Editor.createPage",
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert calls[1] == (
+        "logseq.Editor.createPage",
+        ("2026-03-12", {}, {"createFirstBlock": False}),
+    )
+    assert payload == {
+        "page": {
+            "id": 30,
+            "uuid": "journal-page-uuid",
+            "name": "2026-03-12",
+            "original_name": "2026-03-12",
+            "journal": True,
+            "journal_day": 20260312,
+            "properties": {},
+            "namespace": "",
+        },
+        "created": True,
+        "blocks": [],
+        "block_count": 0,
+    }
