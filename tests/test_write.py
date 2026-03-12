@@ -236,6 +236,160 @@ async def test_block_append_preserves_requested_hierarchy_and_order(token_env):
     assert [child["content"] for child in data["blocks"][0]["children"]] == ["child a1", "child a2"]
 
 
+async def test_journal_append_accepts_strings_and_nested_objects(token_env):
+    from logseq_mcp.tools.write import journal_append
+
+    payload = [
+        "journal root 1",
+        {
+            "content": "journal root 2",
+            "properties": {"kind": "task"},
+            "children": [{"content": "journal child"}],
+        },
+    ]
+    calls = []
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getPage":
+            if len(calls) == 1:
+                return None
+            return {
+                "id": 7,
+                "uuid": "journal-page-uuid",
+                "name": "2026-04-11",
+                "original-name": "2026-04-11",
+                "journal?": True,
+            }
+        if method == "logseq.Editor.createPage":
+            return {"uuid": "journal-page-uuid", "name": "2026-04-11"}
+        if method == "logseq.Editor.appendBlockInPage":
+            content = args[1]
+            return {"uuid": "journal-root-1" if content == "journal root 1" else "journal-root-2"}
+        if method == "logseq.Editor.insertBlock":
+            return {"uuid": "journal-child-1"}
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {"id": 10, "uuid": "journal-root-1", "content": "journal root 1", "children": []},
+                {
+                    "id": 11,
+                    "uuid": "journal-root-2",
+                    "content": "journal root 2",
+                    "properties": {"kind": "task"},
+                    "children": [
+                        {"id": 12, "uuid": "journal-child-1", "content": "journal child", "children": []}
+                    ],
+                },
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await journal_append(mock_ctx, date="2026-04-11", blocks=payload)
+    data = json.loads(result)
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getPage",
+        "logseq.Editor.createPage",
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPageBlocksTree",
+        "logseq.Editor.appendBlockInPage",
+        "logseq.Editor.appendBlockInPage",
+        "logseq.Editor.insertBlock",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert calls[1] == (
+        "logseq.Editor.createPage",
+        ("2026-04-11", {}, {"createFirstBlock": False}),
+    )
+    assert data["page"] == "2026-04-11"
+    assert data["appended"] == 3
+    assert data["block_count"] == 3
+    assert _flatten_block_values(data["blocks"], "content") == [
+        "journal root 1",
+        "journal root 2",
+        "journal child",
+    ]
+
+
+async def test_journal_append_preserves_requested_hierarchy_and_order(token_env):
+    from logseq_mcp.tools.write import journal_append
+
+    payload = [
+        {"content": "journal parent", "children": [{"content": "journal child a"}, {"content": "journal child b"}]},
+        "journal sibling",
+    ]
+    calls = []
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getPage":
+            return {
+                "id": 7,
+                "uuid": "journal-page-uuid",
+                "name": "2026-04-12",
+                "original-name": "2026-04-12",
+                "journal?": True,
+            }
+        if method == "logseq.Editor.appendBlockInPage":
+            content = args[1]
+            return {
+                "uuid": {
+                    "journal parent": "journal-parent-uuid",
+                    "journal sibling": "journal-sibling-uuid",
+                }[content]
+            }
+        if method == "logseq.Editor.insertBlock":
+            content = args[1]
+            return {
+                "uuid": {
+                    "journal child a": "journal-child-a-uuid",
+                    "journal child b": "journal-child-b-uuid",
+                }[content]
+            }
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [
+                {
+                    "id": 21,
+                    "uuid": "journal-parent-uuid",
+                    "content": "journal parent",
+                    "children": [
+                        {"id": 22, "uuid": "journal-child-a-uuid", "content": "journal child a", "children": []},
+                        {"id": 23, "uuid": "journal-child-b-uuid", "content": "journal child b", "children": []},
+                    ],
+                },
+                {"id": 24, "uuid": "journal-sibling-uuid", "content": "journal sibling", "children": []},
+            ]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await journal_append(mock_ctx, date="2026-04-12", blocks=payload)
+    data = json.loads(result)
+
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPage",
+        "logseq.Editor.getPageBlocksTree",
+        "logseq.Editor.appendBlockInPage",
+        "logseq.Editor.insertBlock",
+        "logseq.Editor.insertBlock",
+        "logseq.Editor.appendBlockInPage",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert data["appended"] == 4
+    assert data["block_count"] == 4
+    assert [block["content"] for block in data["blocks"]] == ["journal parent", "journal sibling"]
+    assert [child["content"] for child in data["blocks"][0]["children"]] == [
+        "journal child a",
+        "journal child b",
+    ]
+
+
 async def test_block_update_changes_content_and_verifies_readback(token_env):
     from logseq_mcp.tools.write import block_update
 
@@ -410,6 +564,34 @@ async def test_invalid_nested_payload_fails_before_first_write(token_env):
         await block_append(
             mock_ctx,
             page="Project Alpha",
+            blocks=[{"content": "root", "children": ["invalid-child"]}],
+        )
+
+    client._call.assert_not_called()
+
+
+async def test_journal_append_invalid_date_fails_before_first_write(token_env):
+    from logseq_mcp.tools.write import journal_append
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="invalid journal date"):
+        await journal_append(mock_ctx, date="2026-02-30", blocks=["root 1"])
+
+    client._call.assert_not_called()
+
+
+async def test_journal_append_invalid_nested_payload_fails_before_first_write(token_env):
+    from logseq_mcp.tools.write import journal_append
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises((McpError, ValueError, TypeError)):
+        await journal_append(
+            mock_ctx,
+            date="2026-04-13",
             blocks=[{"content": "root", "children": ["invalid-child"]}],
         )
 

@@ -601,3 +601,30 @@ async def journal_today(ctx: Context) -> str:
             "block_count": _count_blocks(block_tree),
         }
     )
+
+
+@mcp.tool()
+async def journal_append(ctx: Context, date: str, blocks: list | str | dict) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    try:
+        page_name = _resolve_journal_page_name(date)
+        normalized_blocks = _normalize_blocks(blocks)
+    except Exception as exc:
+        raise _normalize_error(exc)
+
+    logger.info("journal_append: %s", page_name)
+
+    await _ensure_journal_page(client, page_name)
+    appended_count = await _append_tree_to_page(client, page_name, normalized_blocks)
+    block_tree = await _get_page_blocks(client, page_name)
+
+    return json.dumps(
+        {
+            "page": page_name,
+            "appended": appended_count,
+            "blocks": [block.model_dump(by_alias=False) for block in block_tree],
+            "block_count": _count_blocks(block_tree),
+        }
+    )
