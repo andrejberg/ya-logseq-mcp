@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from mcp import McpError
 from mcp.server.fastmcp import Context
@@ -616,6 +616,30 @@ async def journal_today(ctx: Context) -> str:
     )
 
 
+_JOURNAL_RANGE_MAX_DAYS = 366
+
+
+def _parse_journal_date(value: str, *, field: str) -> date:
+    """Parse an ISO date string with an explicit McpError on invalid input."""
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"invalid {field}: {value}")) from exc
+
+
+def _iter_inclusive_dates(start: date, end: date, *, max_days: int = _JOURNAL_RANGE_MAX_DAYS) -> list[date]:
+    """Return a list of dates from start to end inclusive, bounded by max_days."""
+    day_count = (end - start).days + 1
+    if day_count > max_days:
+        raise McpError(
+            ErrorData(
+                code=INTERNAL_ERROR,
+                message=f"journal range exceeds maximum span of {max_days} days",
+            )
+        )
+    return [start + timedelta(days=i) for i in range(day_count)]
+
+
 @mcp.tool()
 async def journal_append(ctx: Context, date: str, blocks: list | str | dict) -> str:
     app_ctx: AppContext = ctx.request_context.lifespan_context
@@ -639,5 +663,52 @@ async def journal_append(ctx: Context, date: str, blocks: list | str | dict) -> 
             "appended": appended_count,
             "blocks": [block.model_dump(by_alias=False) for block in block_tree],
             "block_count": _count_blocks(block_tree),
+        }
+    )
+
+
+@mcp.tool()
+async def journal_range(ctx: Context, start_date: str, end_date: str) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    start = _parse_journal_date(start_date, field="start_date")
+    end = _parse_journal_date(end_date, field="end_date")
+
+    if start > end:
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message="start_date must be on or before end_date")
+        )
+
+    dates = _iter_inclusive_dates(start, end)
+
+    logger.info("journal_range: %s to %s (%d days)", start_date, end_date, len(dates))
+
+    entries = []
+    for day in dates:
+        day_str = day.isoformat()
+        page = await _get_page_or_none(client, day_str)
+        if page is None:
+            continue
+        if not page.journal:
+            raise McpError(
+                ErrorData(code=INTERNAL_ERROR, message=f"resolved page is not a journal page: {day_str}")
+            )
+        block_tree = await _get_page_blocks(client, day_str)
+        entries.append(
+            {
+                "page": page.model_dump(by_alias=False),
+                "blocks": [block.model_dump(by_alias=False) for block in block_tree],
+                "block_count": _count_blocks(block_tree),
+            }
+        )
+
+    return json.dumps(
+        {
+            "start_date": start_date,
+            "end_date": end_date,
+            "days": len(dates),
+            "entries": entries,
+            "entry_count": len(entries),
         }
     )
