@@ -1305,3 +1305,219 @@ async def test_journal_today_creates_missing_page_and_reads_back_journal_payload
         "blocks": [],
         "block_count": 0,
     }
+
+
+# ---------------------------------------------------------------------------
+# JOUR-03: journal_range unit coverage
+# ---------------------------------------------------------------------------
+
+
+def _make_journal_page(date_str: str) -> dict:
+    """Build a minimal journal PageEntity dict for a given ISO date string."""
+    day_int = int(date_str.replace("-", ""))
+    return {
+        "id": day_int,
+        "uuid": f"journal-{date_str}",
+        "name": date_str,
+        "original-name": date_str,
+        "journal?": True,
+        "journal-day": day_int,
+    }
+
+
+def _make_non_journal_page(name: str) -> dict:
+    return {
+        "id": 999,
+        "uuid": f"page-{name}",
+        "name": name,
+        "original-name": name,
+        "journal?": False,
+        "journal-day": None,
+    }
+
+
+async def test_journal_range_single_day_returns_one_entry(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getPage":
+            return _make_journal_page("2030-06-15")
+        if method == "logseq.Editor.getPageBlocksTree":
+            return [{"id": 1, "uuid": "blk-1", "content": "entry", "children": []}]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = json.loads(await journal_range(mock_ctx, start_date="2030-06-15", end_date="2030-06-15"))
+
+    assert result["start_date"] == "2030-06-15"
+    assert result["end_date"] == "2030-06-15"
+    assert result["days"] == 1
+    assert result["entry_count"] == 1
+    assert len(result["entries"]) == 1
+    assert result["entries"][0]["page"]["name"] == "2030-06-15"
+
+
+async def test_journal_range_multi_day_inclusive_returns_all_existing(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    existing_dates = {"2030-06-10", "2030-06-11", "2030-06-12"}
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getPage":
+            date_str = args[0]
+            if date_str in existing_dates:
+                return _make_journal_page(date_str)
+            return None
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = json.loads(await journal_range(mock_ctx, start_date="2030-06-10", end_date="2030-06-12"))
+
+    assert result["days"] == 3
+    assert result["entry_count"] == 3
+    returned_dates = [e["page"]["name"] for e in result["entries"]]
+    assert returned_dates == sorted(returned_dates)
+
+
+async def test_journal_range_missing_days_are_skipped(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    existing_dates = {"2030-07-01", "2030-07-03"}
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getPage":
+            date_str = args[0]
+            if date_str in existing_dates:
+                return _make_journal_page(date_str)
+            return None
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = json.loads(await journal_range(mock_ctx, start_date="2030-07-01", end_date="2030-07-03"))
+
+    assert result["days"] == 3
+    assert result["entry_count"] == 2
+    returned_dates = [e["page"]["name"] for e in result["entries"]]
+    assert returned_dates == ["2030-07-01", "2030-07-03"]
+
+
+async def test_journal_range_entries_are_sorted_ascending(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    dates_in_range = ["2030-08-01", "2030-08-02", "2030-08-03"]
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getPage":
+            date_str = args[0]
+            return _make_journal_page(date_str)
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = json.loads(await journal_range(mock_ctx, start_date="2030-08-01", end_date="2030-08-03"))
+
+    returned_dates = [e["page"]["name"] for e in result["entries"]]
+    assert returned_dates == sorted(returned_dates)
+    assert returned_dates == dates_in_range
+
+
+async def test_journal_range_invalid_start_date_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="invalid start_date"):
+        await journal_range(mock_ctx, start_date="not-a-date", end_date="2030-06-15")
+
+    client._call.assert_not_called()
+
+
+async def test_journal_range_invalid_end_date_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="invalid end_date"):
+        await journal_range(mock_ctx, start_date="2030-06-01", end_date="2030-13-01")
+
+    client._call.assert_not_called()
+
+
+async def test_journal_range_reversed_range_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="start_date must be on or before end_date"):
+        await journal_range(mock_ctx, start_date="2030-06-15", end_date="2030-06-01")
+
+    client._call.assert_not_called()
+
+
+async def test_journal_range_span_exceeding_max_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    client = AsyncMock()
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="journal range exceeds maximum span"):
+        await journal_range(mock_ctx, start_date="2030-01-01", end_date="2031-02-10")
+
+    client._call.assert_not_called()
+
+
+async def test_journal_range_non_journal_page_raises_explicit_error(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getPage":
+            return _make_non_journal_page("2030-09-01")
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    with pytest.raises(McpError, match="resolved page is not a journal page"):
+        await journal_range(mock_ctx, start_date="2030-09-01", end_date="2030-09-01")
+
+
+async def test_journal_range_does_not_call_get_all_pages(token_env):
+    from logseq_mcp.tools.write import journal_range
+
+    async def fake_call(method, *args):
+        if method == "logseq.Editor.getAllPages":
+            raise AssertionError("getAllPages must not be called by journal_range")
+        if method == "logseq.Editor.getPage":
+            return _make_journal_page(args[0])
+        if method == "logseq.Editor.getPageBlocksTree":
+            return []
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = json.loads(await journal_range(mock_ctx, start_date="2030-10-01", end_date="2030-10-02"))
+
+    assert result["entry_count"] == 2
