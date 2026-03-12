@@ -30,7 +30,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for the archived milestone roadmap.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: lifecycle write test scaffold and shared verification helpers
+- [x] 05-01: lifecycle write test scaffold and shared verification helpers
 - [ ] 05-02: `delete_page` and `rename_page`
 
 #### Phase 6: Block Moves and Journal Writes
@@ -75,6 +75,6 @@ Plans:
 | 2. Core Reads | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 3. Write Tools | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
-| 5. Lifecycle Write Semantics | v1.1 | 0/2 | Not started | - |
+| 5. Lifecycle Write Semantics | v1.1 | 1/2 | In Progress | - |
 | 6. Block Moves and Journal Writes | v1.1 | 0/3 | Not started | - |
 | 7. Journal Range and Milestone Validation | v1.1 | 0/3 | Not started | - |
