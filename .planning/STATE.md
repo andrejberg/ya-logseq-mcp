@@ -4,16 +4,16 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 5
 current_phase_name: lifecycle write semantics
-current_plan: 2
-status: In progress
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-12T13:23:44.584Z"
+current_plan: 02
+status: verifying
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-12T13:31:31.973Z"
 last_activity: 2026-03-12
 progress:
-  total_phases: 7
-  completed_phases: 4
-  total_plans: 14
-  completed_plans: 13
+  total_phases: 3
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
   percent: 93
 ---
 
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 5 Plan 02 public lifecycle write delivery on top of the new verification scaffold
+**Current focus:** Phase 5 lifecycle writes are complete; Phase 6 block moves and journal writes are next
 
 ## Current Position
 
@@ -33,7 +33,7 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Total Phases:** 7
 **Current Plan:** 02
 **Total Plans in Phase:** 2
-**Status:** In progress
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-12
 
 Progress: [█████████░] 93%
@@ -72,6 +72,7 @@ Progress: [█████████░] 93%
 | Phase 04-integration-and-swap P02 | 26min | 2 tasks | 2 files |
 | Phase 04-integration-and-swap P03 | 8min | 2 tasks | 6 files |
 | Phase 05 P01 | 5min | 2 tasks | 4 files |
+| Phase 05 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -116,11 +117,12 @@ Recent decisions affecting current work:
 - [Phase 05-lifecycle-write-semantics]: Page lifecycle writes keep the Phase 3 contract by proving delete and rename success with follow-up `getPage` reads instead of trusting raw mutation payloads.
 - [Phase 05-lifecycle-write-semantics]: Destructive lifecycle tests must use disposable Phase 5 pages with explicit setup and cleanup helpers rather than mutating the fixed Phase 4 fixture pages.
 - [Phase 05-lifecycle-write-semantics]: Live lifecycle assertions compare page `name` case-insensitively and use exact `original-name` when present because Logseq may lowercase resolved page names after page lifecycle mutations.
+- [Phase 05]: delete_page and rename_page only report success after follow-up getPage verification rather than trusting lifecycle RPC payloads
+- [Phase 05]: The existing bottom-of-file write-module import in server.py remains the lifecycle tool registration path because decorated handlers register automatically
+- [Phase 05]: Namespaced lifecycle transport tests use disposable pages and public MCP tools to keep destructive verification isolated
 
 ### Pending Todos
 
-- Implement public `delete_page` and `rename_page` handlers on top of the Phase 5 helper scaffold
-- Extend MCP stdio coverage once the public lifecycle tools are registered
 - Lock journal lookup strategy before Phase 6 implementation
 
 ### Blockers/Concerns
@@ -130,6 +132,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T13:23:44.581Z
-**Stopped At:** Completed 05-01-PLAN.md
+Last session: 2026-03-12T13:31:31.972Z
+**Stopped At:** Completed 05-02-PLAN.md
 **Resume File:** None
