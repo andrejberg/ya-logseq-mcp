@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Logseq MCP Server MVP** - Phases 1-4 shipped on 2026-03-12
-- 🚧 **v1.1 Journals and Lifecycle Tools** - Phases 5-7 planned
+- ✅ **v1.1 Journals and Lifecycle Tools** - Phases 5-7 shipped on 2026-03-12
 - 📋 **v1.2 Queries and Templates** - Future milestone placeholder
 
 ## Phases
@@ -15,7 +15,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for the archived milestone roadmap.
 
 </details>
 
-### 🚧 v1.1 Journals and Lifecycle Tools (In Progress)
+### ✅ v1.1 Journals and Lifecycle Tools (SHIPPED 2026-03-12)
 
 **Milestone Goal:** Add journal workflows and the remaining page/block lifecycle writes so daily-note and structural maintenance flows no longer require client-side orchestration.
 
@@ -61,9 +61,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 07-01: `journal_range` and date-range validation
-- [ ] 07-02: MCP stdio registration and end-to-end tool coverage
-- [ ] 07-03: isolated live graph validation and milestone sign-off
+- [x] 07-01: `journal_range` and date-range validation
+- [x] 07-02: MCP stdio registration and end-to-end tool coverage
+- [x] 07-03: isolated live graph validation and milestone sign-off
 
 ### 📋 v1.2 Queries and Templates (Planned)
 
@@ -79,4 +79,4 @@ Plans:
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
 | 6. Block Moves and Journal Writes | v1.1 | 5/5 | Complete | 2026-03-12 |
-| 7. Journal Range and Milestone Validation | 2/3 | In Progress|  | - |
+| 7. Journal Range and Milestone Validation | v1.1 | 3/3 | Complete | 2026-03-12 |

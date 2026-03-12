@@ -1,10 +1,11 @@
 ---
 phase: 7
 slug: journal-range-and-milestone-validation
-status: draft
-nyquist_compliant: false
-wave_1_complete: false
+status: complete
+nyquist_compliant: true
+wave_1_complete: true
 created: 2026-03-12
+completed: 2026-03-12
 ---
 
 # Phase 7 — Validation Strategy
@@ -38,13 +39,13 @@ created: 2026-03-12
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 7-01-01 | 01 | 1 | JOUR-03 | unit range contract | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ⬜ pending |
-| 7-01-02 | 01 | 1 | JOUR-03 | unit explicit failure modes | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ⬜ pending |
-| 7-01-03 | 01 | 1 | JOUR-03 | unit ordering and bounded lookup guard | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ⬜ pending |
-| 7-02-01 | 02 | 2 | JOUR-03 | registry exposure | `uv run pytest tests/test_server.py -q` | ✅ `tests/test_server.py` | ⬜ pending |
-| 7-02-02 | 02 | 2 | JOUR-03 | stdio transport flow | `source ~/Workspace/.env && uv run pytest tests/integration/test_mcp_stdio.py -x -q -m integration` | ✅ `tests/integration/test_mcp_stdio.py` | ⬜ pending |
-| 7-03-01 | 03 | 3 | JOUR-03 | live isolated range behavior | `source ~/Workspace/.env && uv run pytest tests/integration/test_live_graph.py -x -q -m integration` | ✅ `tests/integration/test_live_graph.py` | ⬜ pending |
-| 7-03-02 | 03 | 3 | JOUR-03 | live destructive + journal milestone regression | `source ~/Workspace/.env && uv run pytest tests/integration/test_live_graph.py -x -q -m integration` | ✅ `tests/integration/test_live_graph.py` | ⬜ pending |
+| 7-01-01 | 01 | 1 | JOUR-03 | unit range contract | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ✅ green |
+| 7-01-02 | 01 | 1 | JOUR-03 | unit explicit failure modes | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ✅ green |
+| 7-01-03 | 01 | 1 | JOUR-03 | unit ordering and bounded lookup guard | `uv run pytest tests/test_write.py -x -q` | ✅ `tests/test_write.py` | ✅ green |
+| 7-02-01 | 02 | 2 | JOUR-03 | registry exposure | `uv run pytest tests/test_server.py -q` | ✅ `tests/test_server.py` | ✅ green |
+| 7-02-02 | 02 | 2 | JOUR-03 | stdio transport flow | `source ~/Workspace/.env && uv run pytest tests/integration/test_mcp_stdio.py -x -q -m integration` | ✅ `tests/integration/test_mcp_stdio.py` | ✅ green |
+| 7-03-01 | 03 | 3 | JOUR-03 | live isolated range behavior | `source ~/Workspace/.env && uv run pytest tests/integration/test_live_graph.py -x -q -m integration` | ✅ `tests/integration/test_live_graph.py` | ✅ green |
+| 7-03-02 | 03 | 3 | JOUR-03 | live destructive + journal milestone regression | `source ~/Workspace/.env && uv run pytest tests/integration/test_live_graph.py -x -q -m integration` | ✅ `tests/integration/test_live_graph.py` | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -52,10 +53,10 @@ created: 2026-03-12
 
 ## Wave 1 Requirements
 
-- [ ] `tests/test_write.py` — `journal_range` inclusive range, invalid/reversed date errors, bounded span, and entry ordering
-- [ ] `tests/test_server.py` — expected tool registry includes `journal_range`
-- [ ] `tests/integration/test_mcp_stdio.py` — stdio list-tools + call-flow checks for `journal_range`
-- [ ] `tests/integration/test_live_graph.py` — isolated graph assertions for inclusive existing entries and reversed-range failure
+- [x] `tests/test_write.py` — `journal_range` inclusive range, invalid/reversed date errors, bounded span, and entry ordering
+- [x] `tests/test_server.py` — expected tool registry includes `journal_range`
+- [x] `tests/integration/test_mcp_stdio.py` — stdio list-tools + call-flow checks for `journal_range`
+- [x] `tests/integration/test_live_graph.py` — isolated graph assertions for inclusive existing entries and reversed-range failure
 
 *Existing pytest and isolated-graph infrastructure from prior phases should be reused.*
 
@@ -79,11 +80,11 @@ created: 2026-03-12
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or an explicit manual checkpoint
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 1 covers fixture and helper scaffolding before public tool + milestone gate checks
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s for quick validation loop
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or an explicit manual checkpoint
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 1 covers fixture and helper scaffolding before public tool + milestone gate checks
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s for quick validation loop
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** COMPLETE — 2026-03-12. All 7 task checks green across unit, registry, stdio, and live slices.
