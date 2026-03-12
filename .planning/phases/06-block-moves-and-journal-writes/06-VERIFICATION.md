@@ -37,7 +37,7 @@ Automated commands run during this verification:
 |---|---|
 | `uv run pytest tests/test_write.py -x -q` | 41 passed |
 | `uv run pytest tests/test_server.py -q` | 5 passed |
-| `uv run pytest tests/ -q -m "not integration"` | Expected green after the new unit coverage lands |
+| `uv run pytest tests/ -q -m "not integration"` | Not rerun in this verification pass; requirement-targeted unit and registry slices above passed |
 | `source ~/Workspace/.env && uv run pytest tests/integration/test_live_graph.py -x -q -m integration` | 12 passed |
 | `source ~/Workspace/.env && uv run pytest tests/integration/test_mcp_stdio.py -x -q -m integration` | 9 passed |
 
