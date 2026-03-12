@@ -7,7 +7,7 @@ import pytest
 
 from logseq_mcp.server import AppContext
 from logseq_mcp.tools.core import health
-from logseq_mcp.tools.write import block_append, block_delete, block_update
+from logseq_mcp.tools.write import block_append, block_delete, block_update, delete_page, rename_page
 from tests.integration.conftest import LIFECYCLE_PAGE_PREFIX, SANDBOX_BASELINE_BLOCKS, find_block_by_content
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
@@ -150,8 +150,9 @@ async def test_delete_page_uses_disposable_target(
         )
         assert await live_client._call("logseq.Editor.getPage", page_name) is not None
 
-        await live_client._call("logseq.Editor.deletePage", page_name)
+        payload = json.loads(await delete_page(_make_ctx(live_client), page_name))
 
+        assert payload == {"ok": True, "name": page_name}
         assert await live_client._call("logseq.Editor.getPage", page_name) is None
         assert await live_client._call("logseq.Editor.getPage", fixture_pages["parity_page"]) is not None
         assert await live_client._call("logseq.Editor.getPage", fixture_pages["sandbox_page"]) is not None
@@ -185,8 +186,9 @@ async def test_rename_page_uses_disposable_target(
             ["Phase 05 lifecycle rename root"],
         )
 
-        await live_client._call("logseq.Editor.renamePage", source_name, target_name)
+        payload = json.loads(await rename_page(_make_ctx(live_client), source_name, target_name))
 
+        assert payload == {"ok": True, "old_name": source_name, "new_name": target_name}
         assert await live_client._call("logseq.Editor.getPage", source_name) is None
         renamed = await live_client._call("logseq.Editor.getPage", target_name)
         assert isinstance(renamed, dict)
@@ -207,24 +209,33 @@ async def test_namespaced_lifecycle_pages_round_trip(
     cleanup_lifecycle_page_fixture,
 ):
     await assert_isolated_graph(live_client)
-    page_name = lifecycle_page_factory("Namespaced Target", namespace="Phase 05 Namespace")
+    source_name = lifecycle_page_factory("Namespaced Source", namespace="Phase 05 Namespace")
+    target_name = lifecycle_page_factory("Namespaced Target", namespace="Phase 05 Namespace")
 
     try:
         page = await ensure_lifecycle_page_fixture(
             live_client,
-            page_name,
+            source_name,
             ["Phase 05 lifecycle namespace root"],
         )
-        resolved = await live_client._call("logseq.Editor.getPage", page_name)
+        payload = json.loads(await rename_page(_make_ctx(live_client), source_name, target_name))
+        resolved = await live_client._call("logseq.Editor.getPage", target_name)
 
         assert isinstance(page.get("name"), str)
-        assert page["name"].casefold() == page_name.casefold()
+        assert page["name"].casefold() == source_name.casefold()
         if isinstance(page.get("original-name"), str):
-            assert page["original-name"] == page_name
+            assert page["original-name"] == source_name
+        assert payload == {"ok": True, "old_name": source_name, "new_name": target_name}
+        assert await live_client._call("logseq.Editor.getPage", source_name) is None
         assert isinstance(resolved, dict)
         assert isinstance(resolved.get("name"), str)
-        assert resolved["name"].casefold() == page_name.casefold()
+        assert resolved["name"].casefold() == target_name.casefold()
         if isinstance(resolved.get("original-name"), str):
-            assert resolved["original-name"] == page_name
+            assert resolved["original-name"] == target_name
+
+        deleted = json.loads(await delete_page(_make_ctx(live_client), target_name))
+        assert deleted == {"ok": True, "name": target_name}
+        assert await live_client._call("logseq.Editor.getPage", target_name) is None
     finally:
-        await cleanup_lifecycle_page_fixture(live_client, page_name)
+        await cleanup_lifecycle_page_fixture(live_client, source_name)
+        await cleanup_lifecycle_page_fixture(live_client, target_name)

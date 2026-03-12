@@ -4,7 +4,11 @@ import json
 
 import pytest
 
-from tests.integration.conftest import SANDBOX_BASELINE_BLOCKS, assert_protocol_clean_stdout, find_block_by_content
+from tests.integration.conftest import (
+    SANDBOX_BASELINE_BLOCKS,
+    assert_protocol_clean_stdout,
+    find_block_by_content,
+)
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.integration]
 
@@ -18,6 +22,8 @@ REQUIRED_TOOLS = {
     "block_append",
     "block_update",
     "block_delete",
+    "delete_page",
+    "rename_page",
 }
 
 
@@ -118,6 +124,64 @@ async def test_mcp_write_round_trip_uses_isolated_graph(
             assert find_block_by_content(readback_payload["blocks"], baseline) is not None
 
         assert_protocol_clean_stdout(handle.stderr_text)
+
+
+async def test_mcp_lifecycle_round_trip_uses_isolated_graph(
+    live_client,
+    seed_fixture_graph,
+    lifecycle_page_factory,
+    cleanup_lifecycle_page_fixture,
+    mcp_session,
+    isolated_graph_env,
+):
+    await seed_fixture_graph(live_client)
+    source_name = lifecycle_page_factory("Stdio Rename Source", namespace="Phase 05 Namespace")
+    target_name = lifecycle_page_factory("Stdio Rename Target", namespace="Phase 05 Namespace")
+
+    try:
+        async with mcp_session as handle:
+            health_payload = _tool_payload(await handle.session.call_tool("health"))
+            assert health_payload["graph"] == isolated_graph_env.graph_name
+
+            create_payload = _tool_payload(
+                await handle.session.call_tool(
+                    "page_create",
+                    {
+                        "name": source_name,
+                        "blocks": ["Phase 05 stdio lifecycle root"],
+                    },
+                )
+            )
+            assert create_payload["page"]["name"].casefold() == source_name.casefold()
+            assert find_block_by_content(create_payload["blocks"], "Phase 05 stdio lifecycle root") is not None
+
+            rename_payload = _tool_payload(
+                await handle.session.call_tool(
+                    "rename_page",
+                    {"old_name": source_name, "new_name": target_name},
+                )
+            )
+            assert rename_payload == {"ok": True, "old_name": source_name, "new_name": target_name}
+
+            renamed_payload = _tool_payload(
+                await handle.session.call_tool("get_page", {"name": target_name})
+            )
+            assert renamed_payload["page"]["name"].casefold() == target_name.casefold()
+            assert find_block_by_content(renamed_payload["blocks"], "Phase 05 stdio lifecycle root") is not None
+
+            delete_payload = _tool_payload(
+                await handle.session.call_tool("delete_page", {"name": target_name})
+            )
+            assert delete_payload == {"ok": True, "name": target_name}
+
+            missing_result = await handle.session.call_tool("get_page", {"name": target_name})
+            error_texts = [item.text for item in missing_result.content if hasattr(item, "text")]
+            assert error_texts, f"missing-page call returned no error text: {missing_result!r}"
+            assert any("page not found" in text for text in error_texts)
+            assert_protocol_clean_stdout(handle.stderr_text)
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, source_name)
+        await cleanup_lifecycle_page_fixture(live_client, target_name)
 
 
 async def test_server_keeps_logs_off_stdout(mcp_session, isolated_graph_env):
