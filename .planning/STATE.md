@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 6 gap closure: implement and verify the remaining cross-page `move_block` readback behavior
+**Current focus:** Phase 6 wrap-up: record the cross-page `move_block` fix and hand off to the remaining Phase 7 journal-range work
 
 ## Current Position
 
@@ -132,11 +132,11 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: Live and stdio journal creation tests use LOGSEQ_MCP_TEST_TODAY to target disposable future journal dates.
 - [Phase 06-block-moves-and-journal-writes]: journal_append returns the block_append payload shape while resolving targets through the shared journal helper contract
 - [Phase 06-block-moves-and-journal-writes]: Disposable future journal dates remain the isolation contract for live and stdio journal append verification
-- [Phase 06-block-moves-and-journal-writes]: WRIT-08 remains in progress until cross-page move readback verification is implemented and verified.
+- [Phase 06-block-moves-and-journal-writes]: `move_block` verifies cross-page moves from the destination page tree and confirms the moved root disappears from the source page when page context is available.
 
 ### Pending Todos
 
-- Execute `06-05` to close the cross-page `move_block` verification gap and re-run Phase 6 verification
+- Plan and execute Phase 7 journal-range work after the final Phase 6 records are written
 
 ### Blockers/Concerns
 
