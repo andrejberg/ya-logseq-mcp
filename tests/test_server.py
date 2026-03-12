@@ -28,6 +28,7 @@ def test_tool_registered(token_env):
         "block_delete",
         "journal_today",
         "journal_append",
+        "journal_range",
         "move_block",
         "delete_page",
         "rename_page",
