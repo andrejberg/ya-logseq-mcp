@@ -4,17 +4,17 @@ milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
-current_plan: 3
-status: verifying
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-03-12T14:24:10.634Z"
+current_plan: 4
+status: planning
+stopped_at: Planned Phase 06 gap-closure follow-up after verification
+last_updated: "2026-03-12T15:30:00.000Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 5
+  completed_phases: 1
+  total_plans: 10
   completed_plans: 5
-  percent: 94
+  percent: 50
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 6 move_block is complete; journal helpers and journal append are next
+**Current focus:** Phase 6 gap closure: document the accepted ISO journal scope and close the remaining cross-page move verification gap
 
 ## Current Position
 
 **Current Phase:** 6
 **Current Phase Name:** block moves and journal writes
-**Total Phases:** 7
-**Current Plan:** 3
-**Total Plans in Phase:** 3
-**Status:** Phase complete — ready for verification
+**Total Phases:** 3
+**Current Plan:** 4
+**Total Plans in Phase:** 5
+**Status:** Phase 6 gap closure in progress
 **Last Activity:** 2026-03-12
 
-Progress: [█████████░] 94%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 15
 - Average duration: 7min
 - Total execution time: 82min
 
@@ -134,7 +134,8 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Lock journal lookup strategy before Phase 6 implementation
+- Execute `06-04` to document accepted ISO journal scope across the remaining Phase 6 records
+- Execute `06-05` to close the cross-page `move_block` verification gap and re-run Phase 6 verification
 
 ### Blockers/Concerns
 
@@ -143,6 +144,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T14:24:10.632Z
-**Stopped At:** Completed 06-03-PLAN.md
+Last session: 2026-03-12T15:30:00.000Z
+**Stopped At:** Planned Phase 06 gap-closure follow-up after verification
 **Resume File:** None
