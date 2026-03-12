@@ -73,6 +73,72 @@ def _contains_block_uuid(blocks: list[BlockEntity], uuid: str) -> bool:
     return False
 
 
+def _collect_subtree_uuids(block: BlockEntity) -> set[str]:
+    uuids = {block.uuid}
+    for child in block.children:
+        uuids.update(_collect_subtree_uuids(child))
+    return uuids
+
+
+def _find_block_with_parent(
+    blocks: list[BlockEntity],
+    uuid: str,
+    parent_uuid: str | None = None,
+) -> tuple[BlockEntity, str | None, list[BlockEntity]] | None:
+    for siblings in (blocks,):
+        for index, block in enumerate(siblings):
+            if block.uuid == uuid:
+                return block, parent_uuid, siblings
+            nested = _find_block_with_parent(block.children, uuid, block.uuid)
+            if nested is not None:
+                return nested
+    return None
+
+
+def _validate_move_position(position: str) -> str:
+    if position not in {"before", "after", "child"}:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message="position must be one of: after, before, child"))
+    return position
+
+
+def _verify_block_moved(
+    block_tree: list[BlockEntity],
+    *,
+    moved_uuid: str,
+    target_uuid: str,
+    position: str,
+    subtree_uuids: set[str],
+) -> None:
+    matches = [uuid for uuid in subtree_uuids if _contains_block_uuid(block_tree, uuid)]
+    if len(matches) != len(subtree_uuids):
+        raise McpError(
+            ErrorData(code=INTERNAL_ERROR, message=f"moved subtree lost descendants after move: {moved_uuid}")
+        )
+
+    moved_result = _find_block_with_parent(block_tree, moved_uuid)
+    target_result = _find_block_with_parent(block_tree, target_uuid)
+    if moved_result is None or target_result is None:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"move verification failed for block: {moved_uuid}"))
+
+    moved_block, moved_parent_uuid, moved_siblings = moved_result
+    _target_block, target_parent_uuid, target_siblings = target_result
+
+    if position == "child":
+        if moved_parent_uuid != target_uuid:
+            raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"move verification failed for block: {moved_uuid}"))
+        return
+
+    if moved_parent_uuid != target_parent_uuid or moved_siblings is not target_siblings:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"move verification failed for block: {moved_uuid}"))
+
+    moved_index = moved_siblings.index(moved_block)
+    target_index = target_siblings.index(_target_block)
+    if position == "before" and moved_index >= target_index:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"move verification failed for block: {moved_uuid}"))
+    if position == "after" and moved_index <= target_index:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"move verification failed for block: {moved_uuid}"))
+
+
 def _normalize_blocks(blocks: None | str | dict | list) -> list[WriteBlockInput]:
     if blocks is None:
         return []
@@ -255,6 +321,25 @@ async def _verify_block_absent(client, uuid: str, page_name: str | None = None) 
             )
 
 
+async def _verify_block_move_readback(
+    client,
+    *,
+    moved_uuid: str,
+    target_uuid: str,
+    position: str,
+    page_name: str,
+    subtree_uuids: set[str],
+) -> None:
+    block_tree = await _get_page_blocks(client, page_name)
+    _verify_block_moved(
+        block_tree,
+        moved_uuid=moved_uuid,
+        target_uuid=target_uuid,
+        position=position,
+        subtree_uuids=subtree_uuids,
+    )
+
+
 def _normalize_error(exc: Exception) -> McpError:
     if isinstance(exc, McpError):
         return exc
@@ -392,3 +477,39 @@ async def rename_page(ctx: Context, old_name: str, new_name: str) -> str:
     await _verify_rename_readback(client, old_name, new_name)
 
     return json.dumps({"ok": True, "old_name": old_name, "new_name": new_name})
+
+
+@mcp.tool()
+async def move_block(ctx: Context, uuid: str, target_uuid: str, position: str) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    logger.info("move_block: %s %s %s", uuid, position, target_uuid)
+
+    normalized_position = _validate_move_position(position)
+    block = await _get_block_or_error(client, uuid)
+    target = await _get_block_or_error(client, target_uuid)
+    page_name = block.page.name if block.page and block.page.name else target.page.name if target.page else None
+    if not page_name:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page block tree unavailable for move: {uuid}"))
+
+    subtree_uuids = _collect_subtree_uuids(block)
+
+    await client._call("logseq.Editor.moveBlock", uuid, target_uuid, normalized_position)
+    await _verify_block_move_readback(
+        client,
+        moved_uuid=uuid,
+        target_uuid=target_uuid,
+        position=normalized_position,
+        page_name=page_name,
+        subtree_uuids=subtree_uuids,
+    )
+
+    return json.dumps(
+        {
+            "ok": True,
+            "uuid": uuid,
+            "target_uuid": target_uuid,
+            "position": normalized_position,
+        }
+    )
