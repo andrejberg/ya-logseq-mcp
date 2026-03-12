@@ -236,6 +236,58 @@ async def test_mcp_move_block_round_trip_uses_isolated_graph(
         await cleanup_lifecycle_page_fixture(live_client, page_name)
 
 
+async def test_mcp_move_block_cross_page_round_trip_uses_isolated_graph(
+    live_client,
+    ensure_cross_page_move_fixture,
+    move_page_factory,
+    cleanup_lifecycle_page_fixture,
+    mcp_session,
+    isolated_graph_env,
+):
+    source_page_name = move_page_factory("Stdio Cross Page Source")
+    destination_page_name = move_page_factory("Stdio Cross Page Destination")
+
+    try:
+        fixture = await ensure_cross_page_move_fixture(live_client, source_page_name, destination_page_name)
+
+        async with mcp_session as handle:
+            health_payload = _tool_payload(await handle.session.call_tool("health"))
+            assert health_payload["graph"] == isolated_graph_env.graph_name
+
+            move_payload = _tool_payload(
+                await handle.session.call_tool(
+                    "move_block",
+                    {
+                        "uuid": fixture["source_uuid"],
+                        "target_uuid": fixture["destination_anchor_uuid"],
+                        "position": "after",
+                    },
+                )
+            )
+            assert move_payload == {
+                "ok": True,
+                "uuid": fixture["source_uuid"],
+                "target_uuid": fixture["destination_anchor_uuid"],
+                "position": "after",
+            }
+
+            destination_payload = _tool_payload(await handle.session.call_tool("get_page", {"name": destination_page_name}))
+            source_payload = _tool_payload(await handle.session.call_tool("get_page", {"name": source_page_name}))
+            destination_top_level = destination_payload["blocks"]
+            ordered_uuids = [block["uuid"] for block in destination_top_level]
+            assert ordered_uuids.index(fixture["source_uuid"]) > ordered_uuids.index(fixture["destination_anchor_uuid"])
+
+            moved_root = find_block_by_content(destination_payload["blocks"], "Cross-page move source")
+            assert moved_root is not None
+            assert find_block_by_content([moved_root], "Cross-page move child") is not None
+            assert find_block_by_content([moved_root], "Cross-page move grandchild") is not None
+            assert find_block_by_content(source_payload["blocks"], "Cross-page move source") is None
+            assert_protocol_clean_stdout(handle.stderr_text)
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, source_page_name)
+        await cleanup_lifecycle_page_fixture(live_client, destination_page_name)
+
+
 async def test_mcp_journal_today_round_trip_uses_isolated_graph(
     live_client,
     journal_page_factory,

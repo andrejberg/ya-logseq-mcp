@@ -362,6 +362,35 @@ async def ensure_move_page(client: LogseqClient, page_name: str) -> dict[str, st
     }
 
 
+async def _ensure_cross_page_move_fixture(
+    client: LogseqClient,
+    source_page_name: str,
+    destination_page_name: str,
+) -> dict[str, str]:
+    source_page = await ensure_lifecycle_page(client, source_page_name)
+    destination_page = await ensure_lifecycle_page(client, destination_page_name)
+    await _reset_page_blocks(client, source_page_name)
+    await _reset_page_blocks(client, destination_page_name)
+
+    source_anchor_uuid = await _append_block(client, source_page_name, "Cross-page source anchor")
+    source_uuid = await _append_block(client, source_page_name, "Cross-page move source")
+    source_child_uuid = await _insert_child_block(client, source_uuid, "Cross-page move child")
+    source_grandchild_uuid = await _insert_child_block(client, source_child_uuid, "Cross-page move grandchild")
+    destination_anchor_uuid = await _append_block(client, destination_page_name, "Cross-page target anchor")
+
+    return {
+        "source_page_name": source_page_name,
+        "source_page_uuid": str(source_page["uuid"]),
+        "destination_page_name": destination_page_name,
+        "destination_page_uuid": str(destination_page["uuid"]),
+        "source_anchor_uuid": source_anchor_uuid,
+        "source_uuid": source_uuid,
+        "source_child_uuid": source_child_uuid,
+        "source_grandchild_uuid": source_grandchild_uuid,
+        "destination_anchor_uuid": destination_anchor_uuid,
+    }
+
+
 def _build_stdio_env(settings: IsolatedGraphEnv) -> dict[str, str]:
     env = os.environ.copy()
     env["LOGSEQ_API_URL"] = settings.api_url
@@ -567,6 +596,17 @@ def ensure_move_page_fixture(
     async def _runner(client: LogseqClient, page_name: str) -> dict[str, str]:
         await _assert_isolated_graph(client, isolated_graph_env)
         return await ensure_move_page(client, page_name)
+
+    return _runner
+
+
+@pytest.fixture
+def ensure_cross_page_move_fixture(
+    isolated_graph_env: IsolatedGraphEnv,
+) -> Callable[[LogseqClient, str, str], Awaitable[dict[str, str]]]:
+    async def _runner(client: LogseqClient, source_page_name: str, destination_page_name: str) -> dict[str, str]:
+        await _assert_isolated_graph(client, isolated_graph_env)
+        return await _ensure_cross_page_move_fixture(client, source_page_name, destination_page_name)
 
     return _runner
 

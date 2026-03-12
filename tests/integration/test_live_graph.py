@@ -388,6 +388,50 @@ async def test_move_block_child_preserves_subtree(
         await cleanup_lifecycle_page_fixture(live_client, page_name)
 
 
+async def test_move_block_cross_page_preserves_subtree_on_destination_page(
+    live_client,
+    assert_isolated_graph,
+    move_page_factory,
+    ensure_cross_page_move_fixture,
+    cleanup_lifecycle_page_fixture,
+):
+    await assert_isolated_graph(live_client)
+    source_page_name = move_page_factory("Cross Page Source")
+    destination_page_name = move_page_factory("Cross Page Destination")
+
+    try:
+        fixture = await ensure_cross_page_move_fixture(live_client, source_page_name, destination_page_name)
+
+        payload = json.loads(
+            await move_block(
+                _make_ctx(live_client),
+                fixture["source_uuid"],
+                fixture["destination_anchor_uuid"],
+                "after",
+            )
+        )
+        destination_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", destination_page_name)
+        source_blocks = await live_client._call("logseq.Editor.getPageBlocksTree", source_page_name)
+
+        assert payload == {
+            "ok": True,
+            "uuid": fixture["source_uuid"],
+            "target_uuid": fixture["destination_anchor_uuid"],
+            "position": "after",
+        }
+        assert _find_top_level_index(destination_blocks, fixture["source_uuid"]) > _find_top_level_index(
+            destination_blocks, fixture["destination_anchor_uuid"]
+        )
+        moved = _find_block_by_uuid(destination_blocks, fixture["source_uuid"])
+        assert moved is not None
+        assert _find_block_by_uuid([moved], fixture["source_child_uuid"]) is not None
+        assert _find_block_by_uuid([moved], fixture["source_grandchild_uuid"]) is not None
+        assert _find_block_by_uuid(source_blocks, fixture["source_uuid"]) is None
+    finally:
+        await cleanup_lifecycle_page_fixture(live_client, source_page_name)
+        await cleanup_lifecycle_page_fixture(live_client, destination_page_name)
+
+
 async def test_journal_today_creates_missing_journal_page(
     live_client,
     assert_isolated_graph,
