@@ -396,17 +396,28 @@ async def _verify_block_move_readback(
     moved_uuid: str,
     target_uuid: str,
     position: str,
-    page_name: str,
+    destination_page_name: str,
+    source_page_name: str | None,
     subtree_uuids: set[str],
 ) -> None:
-    block_tree = await _get_page_blocks(client, page_name)
+    destination_tree = await _get_page_blocks(client, destination_page_name)
     _verify_block_moved(
-        block_tree,
+        destination_tree,
         moved_uuid=moved_uuid,
         target_uuid=target_uuid,
         position=position,
         subtree_uuids=subtree_uuids,
     )
+
+    if source_page_name and source_page_name != destination_page_name:
+        source_tree = await _get_page_blocks(client, source_page_name)
+        if _contains_block_uuid(source_tree, moved_uuid):
+            raise McpError(
+                ErrorData(
+                    code=INTERNAL_ERROR,
+                    message=f"moved block still present on source page after move: {moved_uuid}",
+                )
+            )
 
 
 def _normalize_error(exc: Exception) -> McpError:
@@ -558,8 +569,9 @@ async def move_block(ctx: Context, uuid: str, target_uuid: str, position: str) -
     normalized_position = _validate_move_position(position)
     block = await _get_block_or_error(client, uuid)
     target = await _get_block_or_error(client, target_uuid)
-    page_name = block.page.name if block.page and block.page.name else target.page.name if target.page else None
-    if not page_name:
+    source_page_name = block.page.name if block.page and block.page.name else None
+    destination_page_name = target.page.name if target.page and target.page.name else source_page_name
+    if not destination_page_name:
         raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page block tree unavailable for move: {uuid}"))
 
     subtree_uuids = _collect_subtree_uuids(block)
@@ -570,7 +582,8 @@ async def move_block(ctx: Context, uuid: str, target_uuid: str, position: str) -
         moved_uuid=uuid,
         target_uuid=target_uuid,
         position=normalized_position,
-        page_name=page_name,
+        destination_page_name=destination_page_name,
+        source_page_name=source_page_name,
         subtree_uuids=subtree_uuids,
     )
 

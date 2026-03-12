@@ -1032,6 +1032,74 @@ async def test_move_block_child_verifies_relative_placement_and_subtree(token_en
     }
 
 
+async def test_move_block_cross_page_reads_destination_tree_and_checks_source_absence(token_env):
+    from logseq_mcp.tools.write import move_block
+
+    calls = []
+    source_block = {
+        "id": 100,
+        "uuid": "move-root",
+        "content": "move root",
+        "page": {"id": 1, "uuid": "source-page-uuid", "name": "Source Page"},
+        "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+    }
+    target_block = {
+        "id": 200,
+        "uuid": "target-root",
+        "content": "target root",
+        "page": {"id": 2, "uuid": "target-page-uuid", "name": "Target Page"},
+        "children": [],
+    }
+
+    async def fake_call(method, *args):
+        calls.append((method, args))
+        if method == "logseq.Editor.getBlock":
+            if args[0] == "move-root":
+                return source_block
+            if args[0] == "target-root":
+                return target_block
+        if method == "logseq.Editor.moveBlock":
+            return {"uuid": "move-root"}
+        if method == "logseq.Editor.getPageBlocksTree":
+            page_name = args[0]
+            if page_name == "Target Page":
+                return [
+                    {"id": 200, "uuid": "target-root", "content": "target root", "children": []},
+                    {
+                        "id": 100,
+                        "uuid": "move-root",
+                        "content": "move root",
+                        "children": [{"id": 101, "uuid": "move-child", "content": "move child", "children": []}],
+                    },
+                ]
+            if page_name == "Source Page":
+                return [{"id": 300, "uuid": "source-sibling", "content": "source sibling", "children": []}]
+        return None
+
+    client = AsyncMock()
+    client._call = fake_call
+    mock_ctx = _make_ctx(client)
+
+    result = await move_block(mock_ctx, uuid="move-root", target_uuid="target-root", position="after")
+    data = json.loads(result)
+
+    assert data == {
+        "ok": True,
+        "uuid": "move-root",
+        "target_uuid": "target-root",
+        "position": "after",
+    }
+    assert [method for method, _ in calls] == [
+        "logseq.Editor.getBlock",
+        "logseq.Editor.getBlock",
+        "logseq.Editor.moveBlock",
+        "logseq.Editor.getPageBlocksTree",
+        "logseq.Editor.getPageBlocksTree",
+    ]
+    assert calls[3] == ("logseq.Editor.getPageBlocksTree", ("Target Page",))
+    assert calls[4] == ("logseq.Editor.getPageBlocksTree", ("Source Page",))
+
+
 @pytest.mark.parametrize("position", ["", "left", "sibling"])
 async def test_move_block_rejects_invalid_position(token_env, position):
     from logseq_mcp.tools.write import move_block
