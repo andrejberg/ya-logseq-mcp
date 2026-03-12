@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Journals and Lifecycle Tools
-current_phase: 5
-current_phase_name: lifecycle write semantics
-current_plan: 02
-status: verifying
+current_phase: 6
+current_phase_name: block moves and journal writes
+current_plan: Not started
+status: planning
 stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-12T13:31:31.973Z"
+last_updated: "2026-03-12T13:38:17.957Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
@@ -28,12 +28,12 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 ## Current Position
 
-**Current Phase:** 5
-**Current Phase Name:** lifecycle write semantics
+**Current Phase:** 6
+**Current Phase Name:** block moves and journal writes
 **Total Phases:** 7
-**Current Plan:** 02
+**Current Plan:** Not started
 **Total Plans in Phase:** 2
-**Status:** Phase complete — ready for verification
+**Status:** Ready to plan
 **Last Activity:** 2026-03-12
 
 Progress: [█████████░] 93%
