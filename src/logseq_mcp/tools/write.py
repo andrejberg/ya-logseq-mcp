@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import date, datetime
 
 from mcp import McpError
 from mcp.server.fastmcp import Context
@@ -10,6 +11,8 @@ from logseq_mcp.server import AppContext, mcp
 from logseq_mcp.types import BlockEntity, PageEntity
 
 logger = logging.getLogger(__name__)
+
+SUPPORTED_JOURNAL_PAGE_TITLE_FORMAT = "yyyy-MM-dd"
 
 
 class WriteBlockInput(BaseModel):
@@ -99,6 +102,34 @@ def _validate_move_position(position: str) -> str:
     if position not in {"before", "after", "child"}:
         raise McpError(ErrorData(code=INTERNAL_ERROR, message="position must be one of: after, before, child"))
     return position
+
+
+def _today_date() -> date:
+    return datetime.now().date()
+
+
+def _resolve_journal_page_name(
+    date_str: str | None = None,
+    *,
+    page_title_format: str = SUPPORTED_JOURNAL_PAGE_TITLE_FORMAT,
+) -> str:
+    if page_title_format != SUPPORTED_JOURNAL_PAGE_TITLE_FORMAT:
+        raise McpError(
+            ErrorData(
+                code=INTERNAL_ERROR,
+                message=f"unsupported journal page title format: {page_title_format}",
+            )
+        )
+
+    if date_str is None:
+        journal_date = _today_date()
+    else:
+        try:
+            journal_date = date.fromisoformat(date_str)
+        except ValueError as exc:
+            raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"invalid journal date: {date_str}")) from exc
+
+    return journal_date.isoformat()
 
 
 def _move_block_options(position: str) -> dict:
@@ -252,6 +283,29 @@ async def _verify_page_absent(client, page_name: str) -> None:
     page = await _get_page_or_none(client, page_name)
     if page is not None:
         raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"page still exists after delete: {page_name}"))
+
+
+async def _ensure_journal_page(client, page_name: str) -> tuple[PageEntity, bool, list[BlockEntity]]:
+    page = await _get_page_or_none(client, page_name)
+    created = False
+
+    if page is None:
+        created_page = await client._call(
+            "logseq.Editor.createPage",
+            page_name,
+            {},
+            {"createFirstBlock": False},
+        )
+        if created_page is None:
+            raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"failed to create journal page: {page_name}"))
+        created = True
+
+    page = await _verify_page_present(client, page_name)
+    if not page.journal:
+        raise McpError(ErrorData(code=INTERNAL_ERROR, message=f"resolved page is not a journal page: {page_name}"))
+
+    block_tree = await _get_page_blocks(client, page_name)
+    return page, created, block_tree
 
 
 def _page_matches_name(page: PageEntity, expected_name: str) -> bool:
@@ -519,5 +573,24 @@ async def move_block(ctx: Context, uuid: str, target_uuid: str, position: str) -
             "uuid": uuid,
             "target_uuid": target_uuid,
             "position": normalized_position,
+        }
+    )
+
+
+@mcp.tool()
+async def journal_today(ctx: Context) -> str:
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    client = app_ctx.client
+
+    page_name = _resolve_journal_page_name()
+    logger.info("journal_today: %s", page_name)
+
+    page, created, block_tree = await _ensure_journal_page(client, page_name)
+    return json.dumps(
+        {
+            "page": page.model_dump(by_alias=False),
+            "created": created,
+            "blocks": [block.model_dump(by_alias=False) for block in block_tree],
+            "block_count": _count_blocks(block_tree),
         }
     )
