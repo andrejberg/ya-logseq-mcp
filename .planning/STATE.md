@@ -5,15 +5,15 @@ milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
 current_plan: 3
-status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-03-12T14:17:29.512Z"
+status: verifying
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-03-12T14:24:10.634Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 94
 ---
 
@@ -33,7 +33,7 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Total Phases:** 7
 **Current Plan:** 3
 **Total Plans in Phase:** 3
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-12
 
 Progress: [█████████░] 94%
@@ -75,6 +75,7 @@ Progress: [█████████░] 94%
 | Phase 05 P02 | 4min | 2 tasks | 5 files |
 | Phase 06 P01 | 18min | 2 tasks | 6 files |
 | Phase 06-block-moves-and-journal-writes P02 | 4min | 2 tasks | 6 files |
+| Phase 06-block-moves-and-journal-writes P03 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,8 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: Journal title resolution is centralized in _resolve_journal_page_name and fails explicitly for non-ISO page-title formats.
 - [Phase 06-block-moves-and-journal-writes]: journal_today verifies journal readback after createPage instead of trusting the mutation response.
 - [Phase 06-block-moves-and-journal-writes]: Live and stdio journal creation tests use LOGSEQ_MCP_TEST_TODAY to target disposable future journal dates.
+- [Phase 06-block-moves-and-journal-writes]: journal_append returns the block_append payload shape while resolving targets through the shared journal helper contract
+- [Phase 06-block-moves-and-journal-writes]: Disposable future journal dates remain the isolation contract for live and stdio journal append verification
 
 ### Pending Todos
 
@@ -140,6 +143,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T14:17:29.505Z
-**Stopped At:** Completed 06-02-PLAN.md
+Last session: 2026-03-12T14:24:10.632Z
+**Stopped At:** Completed 06-03-PLAN.md
 **Resume File:** None
