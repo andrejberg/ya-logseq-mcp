@@ -48,7 +48,7 @@ Plans:
 - [x] 06-02: journal helpers and `journal_today`
 - [x] 06-03: `journal_append`
 - [x] 06-04: document ISO journal scope and reconcile Phase 6 records
-- [ ] 06-05: cross-page `move_block` verification and regression coverage
+- [x] 06-05: cross-page `move_block` verification and regression coverage
 
 #### Phase 7: Journal Range and Milestone Validation
 **Goal**: Finish journal history reads and prove the new tool surface over the real MCP entrypoint and isolated live graph.
@@ -78,5 +78,5 @@ Plans:
 | 3. Write Tools | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 4. Integration and Swap | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-12 |
-| 6. Block Moves and Journal Writes | v1.1 | 4/5 | In Progress | - |
+| 6. Block Moves and Journal Writes | v1.1 | 5/5 | Complete | 2026-03-12 |
 | 7. Journal Range and Milestone Validation | v1.1 | 0/3 | Not started | - |

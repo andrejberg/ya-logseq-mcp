@@ -5,15 +5,15 @@ milestone_name: Journals and Lifecycle Tools
 current_phase: 6
 current_phase_name: block moves and journal writes
 current_plan: 5
-status: executing
-stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-03-12T14:58:18.815Z"
+status: verifying
+stopped_at: Completed 06-05-PLAN.md
+last_updated: "2026-03-12T15:06:10.624Z"
 last_activity: 2026-03-12
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 10
-  completed_plans: 6
+  completed_phases: 2
+  total_plans: 7
+  completed_plans: 7
   percent: 60
 ---
 
@@ -24,7 +24,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 6 wrap-up: record the cross-page `move_block` fix and hand off to the remaining Phase 7 journal-range work
+**Current focus:** Phase 7 planning: journal-range reads and milestone validation after Phase 6 closure
 
 ## Current Position
 
@@ -33,7 +33,7 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 **Total Phases:** 3
 **Current Plan:** 5
 **Total Plans in Phase:** 5
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last Activity:** 2026-03-12
 
 Progress: [██████░░░░] 60%
@@ -133,10 +133,12 @@ Recent decisions affecting current work:
 - [Phase 06-block-moves-and-journal-writes]: journal_append returns the block_append payload shape while resolving targets through the shared journal helper contract
 - [Phase 06-block-moves-and-journal-writes]: Disposable future journal dates remain the isolation contract for live and stdio journal append verification
 - [Phase 06-block-moves-and-journal-writes]: `move_block` verifies cross-page moves from the destination page tree and confirms the moved root disappears from the source page when page context is available.
+- [Phase 06]: Cross-page move integration coverage uses disposable source and destination pages in both live and stdio tests
+- [Phase 06]: move_block now verifies cross-page moves from the destination page tree and only checks source-page absence as a secondary assertion
 
 ### Pending Todos
 
-- Plan and execute Phase 7 journal-range work after the final Phase 6 records are written
+- Plan and execute Phase 7 journal-range work
 
 ### Blockers/Concerns
 
@@ -145,6 +147,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-12T14:58:18.811Z
-**Stopped At:** Completed 06-04-PLAN.md
+Last session: 2026-03-12T15:06:02.759Z
+**Stopped At:** Completed 06-05-PLAN.md
 **Resume File:** None

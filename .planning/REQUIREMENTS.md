@@ -16,7 +16,7 @@
 
 - [x] **WRIT-06**: User can delete a page by name and the server verifies the page no longer resolves afterward.
 - [x] **WRIT-07**: User can rename a page by old and new name and the server verifies the new page resolves while the old name no longer does.
-- [ ] **WRIT-08**: User can move a block subtree by UUID relative to another block using `before`, `after`, or `child` positioning and the server verifies the subtree moved correctly.
+- [x] **WRIT-08**: User can move a block subtree by UUID relative to another block using `before`, `after`, or `child` positioning and the server verifies the subtree moved correctly.
 
 ## Future Requirements
 
@@ -60,7 +60,7 @@
 | JOUR-03 | Phase 7 | Pending |
 | WRIT-06 | Phase 5 | Complete |
 | WRIT-07 | Phase 5 | Complete |
-| WRIT-08 | Phase 6 | In progress |
+| WRIT-08 | Phase 6 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 6 total
@@ -69,4 +69,4 @@
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after starting v1.1 milestone planning*
+*Last updated: 2026-03-12 after completing Phase 6*
