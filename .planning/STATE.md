@@ -1,20 +1,20 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: archived
+milestone_name: journals and lifecycle tools
 current_phase: null
-current_phase_name: milestone archived
+current_phase_name: not started
 current_plan: null
-status: archived
-stopped_at: Archived v1.0 milestone and prepared for next milestone creation
-last_updated: "2026-03-12T13:00:00Z"
+status: defining requirements
+stopped_at: Started v1.1 milestone definition and enabled research
+last_updated: "2026-03-12T13:30:00Z"
 last_activity: 2026-03-12
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,19 +24,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** v1.0 archived; define the next milestone before adding new roadmap phases
+**Current focus:** v1.1 journals and lifecycle tools requirements and roadmap
 
 ## Current Position
 
-**Current Phase:** None
-**Current Phase Name:** milestone archived
-**Total Phases:** 4
+**Current Phase:** Not started
+**Current Phase Name:** defining requirements
+**Total Phases:** 0
 **Current Plan:** None
 **Total Plans in Phase:** 0
-**Status:** Archived
+**Status:** Defining requirements
 **Last Activity:** 2026-03-12
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -115,15 +115,17 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- Research journal and lifecycle-tool conventions for the v1.1 scope
+- Define v1.1 requirements with traceable REQ-IDs
+- Create a new roadmap starting at Phase 5
 
 ### Blockers/Concerns
 
-- No active milestone defined. Start the next cycle with `$gsd-new-milestone`.
-- v1.0 archive carries known tech debt from the milestone audit: partial Nyquist cleanup in Phases 1 and 3 plus indirect Phase 1 live-health evidence.
+- v1.0 archive still carries known tech debt from the milestone audit: partial Nyquist cleanup in Phases 1 and 3 plus indirect Phase 1 live-health evidence.
+- `MILESTONES.md` is absent in this repository state, so phase/version continuity for roadmap generation currently depends on the archived v1.0 roadmap.
 
 ## Session Continuity
 
 Last session: 2026-03-12T12:00:00.000Z
-**Stopped At:** Archived v1.0 milestone and removed active REQUIREMENTS.md for next-cycle reset
+**Stopped At:** Began v1.1 milestone setup for journals and lifecycle tools
 **Resume File:** None

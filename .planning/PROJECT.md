@@ -8,6 +8,18 @@ A custom Python MCP server for Logseq that has now shipped as the replacement pa
 
 Every read returns correctly structured blocks and every write produces valid Logseq content — no duplicates, no ghost blocks, no broken hierarchy.
 
+## Current Milestone: v1.1 Journals and Lifecycle Tools
+
+**Goal:** Add journal workflows and the remaining page/block lifecycle write tools so daily-note usage no longer requires client-side orchestration.
+
+**Target features:**
+- `journal_today`
+- `journal_append`
+- `journal_range`
+- `delete_page`
+- `rename_page`
+- `move_block`
+
 ## Requirements
 
 ### Validated
@@ -21,22 +33,20 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 ### Active
 
-- [ ] `find_by_tag` finds blocks/pages by tag via DataScript
-- [ ] `query_properties` finds blocks/pages by property key/value via DataScript
-- [ ] `query` passes raw DataScript queries through
-- [ ] `delete_page` deletes a page entirely
-- [ ] `rename_page` renames a page (Logseq updates links)
-- [ ] `move_block` moves a block to a new location
 - [ ] `journal_today` gets or creates today's journal page
 - [ ] `journal_append` appends blocks to a journal page by date
 - [ ] `journal_range` fetches journal entries for a date range
+- [ ] `delete_page` deletes a page entirely
+- [ ] `rename_page` renames a page (Logseq updates links)
+- [ ] `move_block` moves a block to a new location
 
 ### Out of Scope
 
 <!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
 
-- Kanban tools (kanban_get, kanban_move, kanban_add_task, kanban_list) — not daily-driver; add in v2
-- Template tools (template_list, template_get, template_create, template_delete, template_apply) — not daily-driver; add in v2
+- DataScript query tools (`find_by_tag`, `query_properties`, `query`) — defer to v1.2+ so v1.1 stays focused on journaling and lifecycle writes
+- Kanban tools (kanban_get, kanban_move, kanban_add_task, kanban_list) — not daily-driver; add in v2+
+- Template tools (template_list, template_get, template_create, template_delete, template_apply) — explicitly deferred to a later milestone after v1.1
 - Obsidian backend — removed entirely, Logseq-only
 - Flashcard/whiteboard/decision tools — never used
 - Content parsing (extracting links/tags from block content) — lean output by design
@@ -81,9 +91,10 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 ## Next Milestone Goals
 
-- Turn the deferred query, journal, and additional write tools into a scoped next milestone rather than broad backlog carry-over.
-- Decide whether graphthulhu fallback can be removed after enough daily-driver time on `logseq-mcp`.
-- Close the archive hygiene debt if full audit cleanliness matters: reconcile the explicit `FOUN-07` live checkpoint trail and finish Nyquist cleanup for Phases 1 and 3.
+- Ship the journal tool set: `journal_today`, `journal_append`, and `journal_range`.
+- Ship the remaining lifecycle writes: `delete_page`, `rename_page`, and `move_block`.
+- Keep DataScript query tools and templates deferred to `v1.2+` unless milestone scope is reopened.
+- Decide later whether graphthulhu fallback removal or archive hygiene cleanup deserves its own follow-up milestone.
 
 ## Context
 
@@ -93,4 +104,4 @@ Every read returns correctly structured blocks and every write produces valid Lo
 - Operational note: keep both `logseq-mcp` and graphthulhu in the shared MCP config until a deliberate cleanup phase removes the fallback
 
 ---
-*Last updated: 2026-03-12 after v1.0 milestone completion*
+*Last updated: 2026-03-12 after starting v1.1 milestone planning*
