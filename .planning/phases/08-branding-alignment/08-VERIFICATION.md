@@ -1,43 +1,41 @@
-# Phase 08 Branding Verification
+# Phase 08 Verification
 
-Date: 2026-03-13
-Plan: 08-02
+status: passed
+phase: 08-branding-alignment
+date: 2026-03-13
+plans_checked: [08-01-PLAN.md, 08-02-PLAN.md]
+requirements_checked: [BRAND-01, BRAND-02]
 
-## Scope
+## Goal
 
-This record captures branding consistency checks for:
+Maintainers and users see one canonical project identity (`ya-logseq-mcp`) across metadata, docs, and runtime touchpoints.
 
-- package/repository metadata: `pyproject.toml` (`[project]`, `[project.urls]`, scripts)
-- runtime touchpoints: `src/logseq_mcp/server.py`, `src/logseq_mcp/__init__.py`
-- canonical docs surfaces: `README.md`, `RUNBOOK.md`
-- controlled legacy-name allowance in docs
+## Requirement ID Cross-Reference
 
-## Commands and Outputs
+Requirement IDs declared in PLAN frontmatter:
+- BRAND-01
+- BRAND-02
 
-### 1) Test sanity
+Cross-check against `.planning/REQUIREMENTS.md`:
+- BRAND-01: accounted for (Branding and Naming section)
+- BRAND-02: accounted for (Branding and Naming section)
 
-Command:
+Result: all PLAN frontmatter requirement IDs are accounted for in REQUIREMENTS.md.
+
+## Verification Commands (fresh run)
 
 ```bash
-uv run pytest tests/test_server.py -q
+uv run pytest tests/test_server.py tests/test_core.py tests/test_write.py -q
 ```
-
-Output:
 
 ```text
-......                                                                   [100%]
-6 passed in 0.29s
+................................................................         [100%]
+64 passed in 0.35s
 ```
-
-### 2) Canonical branding presence + repository metadata surface
-
-Command:
 
 ```bash
 rg -n "ya-logseq-mcp|^\[project\.urls\]" pyproject.toml src/logseq_mcp/server.py src/logseq_mcp/__init__.py README.md RUNBOOK.md
 ```
-
-Output:
 
 ```text
 RUNBOOK.md:1:# ya-logseq-mcp Runbook
@@ -61,35 +59,57 @@ pyproject.toml:21:ya-logseq-mcp = "logseq_mcp.__main__:main"
 src/logseq_mcp/server.py:22:mcp = FastMCP("ya-logseq-mcp", lifespan=lifespan)
 ```
 
-### 3) False-positive-safe legacy detector (primary)
-
-Command:
-
 ```bash
 rg -n -P "(?<!ya-)logseq-mcp" README.md RUNBOOK.md pyproject.toml src/logseq_mcp/server.py src/logseq_mcp/__init__.py
 ```
-
-Output:
 
 ```text
 README.md:62:This project was previously referred to as `logseq-mcp`; all current commands and config keys should use `ya-logseq-mcp`.
 ```
 
-### 4) Legacy detector fallback (for environments without `rg -P`)
+## Must-Have Audit (PLAN vs codebase)
 
-Command:
+### Truths
 
-```bash
-rg -n "logseq-mcp" README.md RUNBOOK.md pyproject.toml src/logseq_mcp/server.py src/logseq_mcp/__init__.py | rg -v "ya-logseq-mcp"
-```
+- PASS: Package metadata, CLI entrypoint, and MCP runtime name use `ya-logseq-mcp`.
+  - Evidence: `pyproject.toml` `[project].name`, `[project.scripts]`; `src/logseq_mcp/server.py` `FastMCP("ya-logseq-mcp")`.
+- PASS: Repository metadata surface reflects canonical identity.
+  - Evidence: `pyproject.toml` `[project.urls]` homepage/repository both `ya-logseq-mcp`.
+- PASS: Python import/module path remains `logseq_mcp`.
+  - Evidence: script target `logseq_mcp.__main__:main`, package path `src/logseq_mcp/`.
+- PASS: Runtime server remains valid after branding updates.
+  - Evidence: `tests/test_server.py` includes branding assertion; test suite passed.
+- PASS: README is canonical user-facing source.
+  - Evidence: `README.md` contains install/run/config/smoke guidance; `RUNBOOK.md` states README is canonical.
+- PASS: User-facing command/config examples avoid stale name except explicit migration note.
+  - Evidence: stale-name detector returns only `README.md` migration note.
+- PASS: RUNBOOK no longer competes with README onboarding.
+  - Evidence: `RUNBOOK.md` is operational and defers onboarding to README.
+- PASS: Phase evidence records concrete checks across required surfaces.
+  - Evidence: command outputs above cover metadata/runtime/docs + legacy detector.
 
-Output:
+### Artifacts
 
-```text
-(no matches)
-```
+- PASS: `pyproject.toml` provides canonical package + repository metadata and CLI mapping.
+- PASS: `src/logseq_mcp/server.py` provides canonical runtime identity.
+- PASS: `src/logseq_mcp/__init__.py` docstring aligns to canonical branding.
+- PASS: `tests/test_server.py` provides branding/runtime regression coverage.
+- PASS: `README.md` provides canonical branding contract and migration note.
+- PASS: `RUNBOOK.md` provides maintainer-only operational policy aligned to README-first.
 
-## Requirement Mapping
+### Key Links
 
-- `BRAND-01`: Verified canonical `ya-logseq-mcp` identity in package metadata (`[project]`, `[project.urls]`, scripts), runtime (`FastMCP` name, package docstring), and canonical docs (`README`, `RUNBOOK`).
-- `BRAND-02`: Verified controlled legacy-name allowance with a false-positive-safe detector; only explicit migration note in `README.md` remains.
+- PASS: README command/config naming matches script metadata in `pyproject.toml` (`ya-logseq-mcp`).
+- PASS: README canonical policy and RUNBOOK README-first policy are consistent.
+- PASS: verification commands enforce naming consistency and controlled legacy allowance.
+
+## Requirement Coverage Verdict
+
+- BRAND-01: PASS
+  - Canonical `ya-logseq-mcp` identity is present across package metadata, repository metadata, runtime, and docs touchpoints.
+- BRAND-02: PASS
+  - Users see consistent naming across README, CLI/module entrypoints, and repository branding; only one explicit migration note remains.
+
+## Final Status
+
+passed
