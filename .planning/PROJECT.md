@@ -1,4 +1,4 @@
-# Logseq MCP Server
+# ya-logseq-mcp
 
 ## What This Is
 
@@ -8,19 +8,16 @@ A Python MCP server for Logseq that replaces graphthulhu for daily-driver reads 
 
 Every read returns correctly structured blocks and every write produces valid Logseq content - no duplicates, no ghost blocks, no broken hierarchy.
 
-## Current Milestone: v1.2 Queries and Templates
+## Current Milestone: v1.2 Packaging and GitHub Release
 
-**Goal:** Add scoped query and template tools after v1.1 shipped journaling and lifecycle parity.
+**Goal:** Ship the current functional MCP as a renamed, documented, publish-ready project without adding new MCP features.
 
 **Target features:**
-- `query`
-- `find_by_tag`
-- `query_properties`
-- `template_list`
-- `template_get`
-- `template_create`
-- `template_delete`
-- `template_apply`
+- Move repository from `~/Workspace/projects/logseq-mcp` to `~/Workspace/tools/ya-logseq-mcp`
+- Update local/runtime configuration for the new path and project name
+- Refresh docs for renamed branding and release readiness
+- Improve installation/setup instructions for usability and first-run success
+- Publish repository to GitHub under the new name
 
 ## Requirements
 
@@ -41,14 +38,11 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 ### Active
 
-- [ ] `query` passes raw DataScript queries to Logseq with explicit error handling
-- [ ] `find_by_tag` finds blocks/pages by tag with input sanitization
-- [ ] `query_properties` finds blocks/pages by property key/value with input sanitization
-- [ ] `template_list` lists all templates in the graph
-- [ ] `template_get` gets a template's content by name
-- [ ] `template_create` creates a template from an existing block
-- [ ] `template_delete` deletes a template by name
-- [ ] `template_apply` inserts a template at a page or block
+- [ ] Project is renamed to `ya-logseq-mcp` across package, repo, and documentation
+- [ ] Repository is relocated to `~/Workspace/tools/ya-logseq-mcp` with working dev/test commands
+- [ ] Runtime/config references are updated and validated for the new location/name
+- [ ] Installation instructions are user-friendly and verified end-to-end
+- [ ] Repository is published on GitHub with clear setup/usage docs
 
 ### Out of Scope
 
@@ -58,6 +52,7 @@ Every read returns correctly structured blocks and every write produces valid Lo
 - Content parsing (extracting links/tags from block content) - lean output by design
 - In-memory graph analysis - not needed; Logseq is source of truth
 - Brute-force page scanning for journals - rejected in favor of bounded date lookup
+- Query and template tools (`query`, `find_by_tag`, `query_properties`, `template_*`) - deferred to a future milestone after release hardening
 
 ## Context
 
@@ -82,7 +77,8 @@ Every read returns correctly structured blocks and every write produces valid Lo
 | Deduplicate by UUID | Fix duplicated block trees | ✓ Good |
 | Local isolated test graph | Prevent destructive integration tests from touching real notes | ✓ Good |
 | Bounded date lookup for journals | Deterministic JOUR-03 behavior without brute-force scans | ✓ Good |
-| Keep query/template tools for v1.2 | Preserve v1.1 scope and shipping velocity | ✓ Good |
+| Keep query/template tools for v1.2 | Preserve v1.1 scope and shipping velocity | ⚠️ Revisit |
+| Prioritize shipping current toolset before new capabilities | Reduce integration risk and improve adoption path | — Pending |
 
 ## Current State
 
@@ -93,10 +89,10 @@ Every read returns correctly structured blocks and every write produces valid Lo
 
 ## Next Milestone Goals
 
-- Define v1.2 requirements and roadmap with clear non-goals before execution.
-- Implement query tools first (`query`, `find_by_tag`, `query_properties`) with tight input validation.
-- Implement template tools second with parity between direct and stdio flows.
-- Keep graphthulhu fallback only until v1.2 verification confirms no regressions in existing shipped behavior.
+- Rename and package the project as `ya-logseq-mcp` for external use.
+- Move the repository into `~/Workspace/tools` and fix all path/config assumptions.
+- Raise documentation quality, especially installation clarity and onboarding flow.
+- Publish to GitHub once naming, configuration, and docs are coherent.
 
 ---
-*Last updated: 2026-03-13 after completing v1.1 milestone archival*
+*Last updated: 2026-03-13 after starting v1.2 packaging and release milestone*

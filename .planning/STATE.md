@@ -1,20 +1,20 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: Queries and Templates
+milestone_name: Packaging and GitHub Release
 current_phase: null
-current_phase_name: planning next milestone
+current_phase_name: defining requirements
 current_plan: null
-status: planning
-stopped_at: v1.1 archived and tagged; ready for new milestone intake
-last_updated: "2026-03-13T07:36:25.890Z"
+status: defining requirements
+stopped_at: milestone v1.2 started; requirements in progress
+last_updated: "2026-03-13T08:10:00.000Z"
 last_activity: 2026-03-13
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,19 +24,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Define v1.2 requirements and roadmap (`$gsd-new-milestone`)
+**Current focus:** Define v1.2 packaging/release requirements and roadmap (`$gsd-new-milestone`)
 
 ## Current Position
 
-**Current Phase:** -
-**Current Phase Name:** planning next milestone
-**Total Phases:** 7
-**Current Plan:** -
+**Current Phase:** Not started (defining requirements)
+**Current Phase Name:** defining requirements
+**Total Phases:** -
+**Current Plan:** —
 **Total Plans in Phase:** -
-**Status:** planning next milestone
-**Last Activity:** 2026-03-13
+**Status:** Defining requirements
+**Last Activity:** 2026-03-13 - Milestone v1.2 started
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
