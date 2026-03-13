@@ -1,7 +1,7 @@
 [project]
-name = "logseq-mcp"
+name = "ya-logseq-mcp"
 version = "0.1.0"
-description = "Python MCP server for Logseq — replaces graphthulhu"
+description = "ya-logseq-mcp: Python MCP server for Logseq"
 readme = "README.md"
 authors = [
     { name = "Andrej Berg", email = "mail@andrej-berg.com" }
@@ -13,8 +13,12 @@ dependencies = [
     "pydantic>=2.0.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/andrej-berg/ya-logseq-mcp"
+Repository = "https://github.com/andrej-berg/ya-logseq-mcp"
+
 [project.scripts]
-logseq-mcp = "logseq_mcp.__main__:main"
+ya-logseq-mcp = "logseq_mcp.__main__:main"
 
 [build-system]
 requires = ["uv_build>=0.10.4,<0.11.0"]
@@ -31,3 +35,6 @@ asyncio_mode = "auto"
 markers = [
     "integration: exercises a live Logseq instance against the isolated test graph",
 ]
+
+[tool.uv.build-backend]
+module-name = "logseq_mcp"

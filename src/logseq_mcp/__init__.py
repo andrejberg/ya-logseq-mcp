@@ -1,1 +1,1 @@
-"""logseq-mcp: Custom Python MCP server for Logseq."""
+"""ya-logseq-mcp: Custom Python MCP server for Logseq."""
