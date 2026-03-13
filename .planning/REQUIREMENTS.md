@@ -55,21 +55,21 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | Phase TBD | Pending |
-| BRAND-02 | Phase TBD | Pending |
-| MOVE-01 | Phase TBD | Pending |
-| MOVE-02 | Phase TBD | Pending |
-| MOVE-03 | Phase TBD | Pending |
-| DOCS-01 | Phase TBD | Pending |
-| DOCS-02 | Phase TBD | Pending |
-| DOCS-03 | Phase TBD | Pending |
-| PUB-01 | Phase TBD | Pending |
-| PUB-02 | Phase TBD | Pending |
+| BRAND-01 | Phase 8 | Pending |
+| BRAND-02 | Phase 8 | Pending |
+| MOVE-01 | Phase 9 | Pending |
+| MOVE-02 | Phase 9 | Pending |
+| MOVE-03 | Phase 9 | Pending |
+| DOCS-01 | Phase 10 | Pending |
+| DOCS-02 | Phase 10 | Pending |
+| DOCS-03 | Phase 10 | Pending |
+| PUB-01 | Phase 11 | Pending |
+| PUB-02 | Phase 11 | Pending |
 
 **Coverage:**
 - v1 requirements: 10 total
-- Mapped to phases: 0
-- Unmapped: 10 ⚠️
+- Mapped to phases: 10
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-13*
