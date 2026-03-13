@@ -1,59 +1,26 @@
-# logseq-mcp Runbook
+# ya-logseq-mcp Runbook
 
-Operational knowledge for running, deploying, and troubleshooting the logseq-mcp server.
+Internal operational notes for maintainers.
 
----
+User-facing install/run/config guidance lives in `README.md` and is canonical.
 
-## MCP Config: `uv run` requires `--project`, not `cwd`
+## Operational Constraints
 
-**Context:** Claude Code reads `.mcp.json` to start MCP servers. The `cwd` field in `.mcp.json` is **not reliably used** when spawning the server process — Claude Code may run the command from its own working directory instead.
+- Always invoke `uv run` with `--project /absolute/path/to/repo` when launched by external tools.
+- Keep MCP server key and script naming aligned to `ya-logseq-mcp`.
+- Treat `README.md` as the only onboarding source; this runbook should not duplicate setup steps.
 
-**Symptom:** `logseq-mcp` shows as "not connected" when starting Claude from `~/Workspace/`, but works when starting from `~/Workspace/projects/logseq-mcp/`.
+## Troubleshooting
 
-**Root cause:** `uv run python -m logseq_mcp` with `cwd` ignored means `uv` runs from `~/Workspace/`, finds no `pyproject.toml` there, falls back to `/usr/bin/python3`, and fails with `No module named logseq_mcp`.
+### Server does not start from MCP client
 
-**Fix:** Use `uv run --project <absolute-path>` to pin the project explicitly:
+- Symptom: client reports the server is disconnected.
+- Check: command includes `--project` and points at this repository.
+- Check: `LOGSEQ_API_TOKEN` is set and Logseq HTTP API is enabled.
 
-```json
-{
-  "mcpServers": {
-    "logseq-mcp": {
-      "command": "uv",
-      "args": ["run", "--project", "/home/berga/Workspace/projects/logseq-mcp", "python", "-m", "logseq_mcp"],
-      "env": { ... }
-    }
-  }
-}
-```
-
-**Rule for shipping:** Always use `--project <absolute-path>` in any installation instructions or distributed `.mcp.json` examples. Never rely on `cwd`. Users installing the server from any working directory must have this flag set.
-
----
-
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `LOGSEQ_API_TOKEN` | yes | — | Auth token from Logseq settings |
-| `LOGSEQ_API_URL` | no | `http://127.0.0.1:12315` | Logseq HTTP API endpoint |
-
----
-
-## Starting the Server Manually
-
-```bash
-LOGSEQ_API_TOKEN=<token> uv run --project /path/to/logseq-mcp python -m logseq_mcp
-```
-
-Server speaks MCP over stdio — it will block waiting for input. Use Claude Code or another MCP client to connect.
-
----
-
-## Smoke Test
-
-With Logseq running and API enabled:
+### Quick maintainer smoke
 
 ```bash
 source ~/Workspace/.env
-uv run --project /home/berga/Workspace/projects/logseq-mcp pytest tests/ -x
+uv run --project /home/berga/Workspace/projects/logseq-mcp pytest tests/test_server.py -q
 ```
