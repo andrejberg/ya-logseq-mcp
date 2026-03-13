@@ -9,8 +9,8 @@ Requirements for milestone v1.2 (packaging and GitHub release).
 
 ### Branding and Naming
 
-- [ ] **BRAND-01**: Maintainer can set `ya-logseq-mcp` as the canonical name across package metadata, repository metadata, and documentation.
-- [ ] **BRAND-02**: User can identify the same project name consistently across README, module/CLI entrypoints, and repository branding.
+- [x] **BRAND-01**: Maintainer can set `ya-logseq-mcp` as the canonical name across package metadata, repository metadata, and documentation.
+- [x] **BRAND-02**: User can identify the same project name consistently across README, module/CLI entrypoints, and repository branding.
 
 ### Relocation and Configuration
 
@@ -55,8 +55,8 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | Phase 8 | Pending |
-| BRAND-02 | Phase 8 | Pending |
+| BRAND-01 | Phase 8 | Complete |
+| BRAND-02 | Phase 8 | Complete |
 | MOVE-01 | Phase 9 | Pending |
 | MOVE-02 | Phase 9 | Pending |
 | MOVE-03 | Phase 9 | Pending |
