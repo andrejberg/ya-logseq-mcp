@@ -37,7 +37,7 @@ Use the script entrypoint name and pin the project path with `--project`:
       "args": [
         "run",
         "--project",
-        "/home/berga/Workspace/projects/logseq-mcp",
+        "/home/berga/Workspace/projects/ya-logseq-mcp",
         "ya-logseq-mcp"
       ],
       "env": {
@@ -54,6 +54,8 @@ Use the script entrypoint name and pin the project path with `--project`:
 ```bash
 uv run pytest tests/test_server.py -q
 ```
+
+For maintainers, branding consistency checks are documented in `RUNBOOK.md`.
 
 ## Migration Note
 
