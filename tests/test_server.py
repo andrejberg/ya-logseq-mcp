@@ -37,6 +37,26 @@ def test_tool_registered(token_env):
     assert not missing, f"missing tools {sorted(missing)} from: {tool_names}"
 
 
+def test_server_branding_name(token_env):
+    """Server metadata should expose the canonical branded runtime name."""
+    from logseq_mcp.server import mcp
+
+    names = []
+    for attr in ("name", "server_name"):
+        value = getattr(mcp, attr, None)
+        if isinstance(value, str) and value:
+            names.append(value)
+
+    lowlevel = getattr(mcp, "_mcp_server", None)
+    if lowlevel is not None:
+        for attr in ("name", "server_name"):
+            value = getattr(lowlevel, attr, None)
+            if isinstance(value, str) and value:
+                names.append(value)
+
+    assert "ya-logseq-mcp" in set(names), f"server name metadata mismatch: {sorted(set(names))}"
+
+
 def test_stderr_only(token_env, capsys):
     """Importing server modules must not write to stdout."""
     # Re-import to trigger any module-level side effects
