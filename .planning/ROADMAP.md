@@ -26,7 +26,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
 
 **Milestone Goal:** Ship the current MCP server as `ya-logseq-mcp` with coherent naming, relocation, onboarding docs, and GitHub publication.
 
-- [ ] **Phase 8: Branding Alignment** - Canonical `ya-logseq-mcp` naming is consistent across package/repo/docs and user-facing entrypoints.
+- [x] **Phase 8: Branding Alignment** - Canonical `ya-logseq-mcp` naming is consistent across package/repo/docs and user-facing entrypoints. (completed 2026-03-13)
 - [ ] **Phase 9: Relocation and Runtime Configuration** - Repository move and path assumptions are updated with working dev/test workflows and client config examples.
 - [ ] **Phase 10: Installation and Onboarding UX** - Setup documentation is end-to-end runnable from a clean environment with explicit smoke checks.
 - [ ] **Phase 11: GitHub Publication Surface** - Public repository publishing and GitHub-home discoverability are complete.
@@ -83,7 +83,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
 | 5. Lifecycle Write Semantics | v1.1 | 2/2 | Complete | 2026-03-13 |
 | 6. Block Moves and Journal Writes | v1.1 | 5/5 | Complete | 2026-03-13 |
 | 7. Journal Range and Milestone Validation | v1.1 | 3/3 | Complete | 2026-03-13 |
-| 8. Branding Alignment | v1.2 | 1/2 | In Progress | - |
+| 8. Branding Alignment | 2/2 | Complete   | 2026-03-13 | - |
 | 9. Relocation and Runtime Configuration | v1.2 | 0/TBD | Not started | - |
 | 10. Installation and Onboarding UX | v1.2 | 0/TBD | Not started | - |
 | 11. GitHub Publication Surface | v1.2 | 0/TBD | Not started | - |

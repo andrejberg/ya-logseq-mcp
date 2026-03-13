@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Packaging and GitHub Release
-current_phase: 8
+current_phase: 8 (Branding Alignment)
 current_phase_name: branding alignment
 current_plan: 2
-status: in progress
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-13T14:55:00.088Z"
-last_activity: 2026-03-13 - Completed 08-01 branding metadata/runtime alignment
+status: verifying
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-13T15:00:44.246Z"
+last_activity: 2026-03-13
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 50
 ---
 
@@ -33,8 +33,8 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Total Phases:** 4 (phases 8-11 in this milestone)
 **Current Plan:** 2
 **Total Plans in Phase:** 2
-**Status:** In progress
-**Last Activity:** 2026-03-13 - Completed 08-01 branding metadata/runtime alignment
+**Status:** Phase complete — ready for verification
+**Last Activity:** 2026-03-13
 
 Progress: [█████░░░░░] 50%
 
@@ -60,6 +60,7 @@ Progress: [█████░░░░░] 50%
 
 *Updated after each plan completion*
 | Phase 08 P01 | 2min | 2 tasks | 4 files |
+| Phase 08 P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Recent decisions affecting current work:
 - Success criteria for phases 8-11 are phrased as observable maintainer/user outcomes.
 - [Phase 08]: Kept Python import namespace logseq_mcp while renaming distribution, script, and runtime branding to ya-logseq-mcp.
 - [Phase 08]: Added tool.uv.build-backend.module-name=logseq_mcp to preserve package resolution after distribution rename.
+- [Phase 08]: Use README as the only canonical user-facing setup surface and keep RUNBOOK operational-only.
+- [Phase 08]: Use false-positive-safe legacy detection with (?<!ya-)logseq-mcp and fallback grep filtering.
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13T14:55:00.086Z
-**Stopped At:** Completed 08-01-PLAN.md
+Last session: 2026-03-13T15:00:44.244Z
+**Stopped At:** Completed 08-02-PLAN.md
 **Resume File:** None
