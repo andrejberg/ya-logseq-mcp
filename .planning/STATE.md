@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Journals and Lifecycle Tools
-current_phase: 07
-current_phase_name: journal range and milestone validation
-current_plan: Not started
-status: completed
-stopped_at: Completed 07-03-PLAN.md — v1.1 milestone shipped
-last_updated: "2026-03-12T22:06:18.606Z"
-last_activity: 2026-03-12
+milestone: v1.2
+milestone_name: Queries and Templates
+current_phase: null
+current_phase_name: planning next milestone
+current_plan: null
+status: planning
+stopped_at: v1.1 archived and tagged; ready for new milestone intake
+last_updated: "2026-03-13T07:36:25.890Z"
+last_activity: 2026-03-13
 progress:
   total_phases: 3
   completed_phases: 3
@@ -21,20 +21,20 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-12)
+See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Phase 7 planning: journal-range reads and milestone validation after Phase 6 closure
+**Current focus:** Define v1.2 requirements and roadmap (`$gsd-new-milestone`)
 
 ## Current Position
 
-**Current Phase:** 07
-**Current Phase Name:** journal range and milestone validation
+**Current Phase:** -
+**Current Phase Name:** planning next milestone
 **Total Phases:** 7
-**Current Plan:** Not started
-**Total Plans in Phase:** 3
-**Status:** Milestone complete
-**Last Activity:** 2026-03-12
+**Current Plan:** -
+**Total Plans in Phase:** -
+**Status:** planning next milestone
+**Last Activity:** 2026-03-13
 
 Progress: [██████████] 100%
 
