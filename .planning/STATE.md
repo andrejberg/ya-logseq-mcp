@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 10
 current_phase_name: installation and onboarding ux
-current_plan: 1 of 1
+current_plan: Not started
 status: planning
 stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-16T12:11:25.182Z"
+last_updated: "2026-03-16T12:13:40.353Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 10
 **Current Phase Name:** installation and onboarding ux
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** 1 of 1
+**Current Plan:** Not started
 **Total Plans in Phase:** 1
-**Status:** Ready for planning
+**Status:** Ready to plan
 **Last Activity:** 2026-03-16
 
 Progress: [██████████] 100%
