@@ -1,3 +1,8 @@
+status: passed
+rationale: Phase 10 goal is achieved; README+RUNBOOK provide docs-only install/config/validation flow and smoke evidence is reproducible.
+verified_by: phase-verifier
+verified_on: 2026-03-16
+
 # Phase 10 Verification Evidence
 
 Date: 2026-03-16 (UTC+01)
@@ -120,3 +125,26 @@ Interpretation:
 - DOCS-01: satisfied by fresh shell prereq checks, explicit missing-token failure clarity, and successful env-loaded onboarding smoke.
 - DOCS-02: satisfied by machine-validated README JSON config shape (`command/args/cwd/env`) and startup semantics plus negative guard.
 - DOCS-03: satisfied by passing unit + integration smoke checks and documented "If smoke fails" escalation to Troubleshooting/RUNBOOK.
+
+## Verifier Cross-Check Addendum (2026-03-16)
+
+Plan frontmatter requirement IDs:
+- `10-01-PLAN.md`: DOCS-01, DOCS-02, DOCS-03
+- `10-02-PLAN.md`: DOCS-01, DOCS-02, DOCS-03
+
+Requirement registry cross-reference:
+- `.planning/REQUIREMENTS.md` includes DOCS-01, DOCS-02, DOCS-03 and marks all complete under "Documentation and Installation UX".
+
+Must-have artifacts/links validated in real files:
+- `README.md` contains prerequisites, install, run, MCP config (`command/args/cwd/env`), smoke checks, and "If smoke fails" escalation.
+- `RUNBOOK.md` keeps maintainer-only guardrails and troubleshooting, explicitly deferring user onboarding to README.
+- `tests/integration/conftest.py` validates MCP config structure (`command`, `args`, `env`, `cwd`) matching README contract.
+- `tests/integration/test_mcp_stdio.py` contains the documented stdio smoke entrypoint (`test_stdio_server_exposes_expected_tools`).
+
+Spot re-validation performed by verifier:
+- `uv run --project ~/Workspace/tools/ya-logseq-mcp python -c ...` => `readme-config-parse-and-startup-ok`
+- `uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/test_server.py -q` => `6 passed`
+- `source ~/Workspace/.env && uv run pytest tests/integration/test_mcp_stdio.py::test_stdio_server_exposes_expected_tools -x -q -m integration` => `1 passed`
+
+Gaps:
+- None.
