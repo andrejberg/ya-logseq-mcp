@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 10
 current_phase_name: installation and onboarding ux
-current_plan: 0 of TBD
-status: ready_for_planning
+current_plan: 1 of 1
+status: planning
 stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-16T12:10:00.000Z"
+last_updated: "2026-03-16T12:11:25.182Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
@@ -31,8 +31,8 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 10
 **Current Phase Name:** installation and onboarding ux
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** 0 of TBD
-**Total Plans in Phase:** TBD
+**Current Plan:** 1 of 1
+**Total Plans in Phase:** 1
 **Status:** Ready for planning
 **Last Activity:** 2026-03-16
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100%
 | Phase 08 P01 | 2min | 2 tasks | 4 files |
 | Phase 08 P02 | 3min | 2 tasks | 3 files |
 | Phase 09 P01 | 22min | 2 tasks | 4 files |
+| Phase 09 P02 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Use ~/Workspace/tools/ya-logseq-mcp as canonical runtime path in docs and maintainer guidance.
 - [Phase 09]: Normalize home-relative --project args from MCP config before subprocess launch in integration helper.
 - [Phase 09]: Close requirement traceability using explicit relocation verification evidence in `09-VERIFICATION.md`.
+- [Phase 09]: Close MOVE requirement traceability using explicit command evidence in 09-VERIFICATION.md.
+- [Phase 09]: Advance state routing to Phase 10 planning readiness immediately after Phase 9 completion.
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T11:58:06.339Z
+Last session: 2026-03-16T12:11:25.179Z
 **Stopped At:** Completed 09-02-PLAN.md
 **Resume File:** None
