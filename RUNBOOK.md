@@ -6,7 +6,7 @@ User-facing install/run/config guidance lives in `README.md` and is canonical.
 
 ## Operational Constraints
 
-- Always invoke `uv run` with `--project /absolute/path/to/repo` when launched by external tools.
+- Always invoke `uv run` with `--project ~/Workspace/tools/ya-logseq-mcp` when launched by external tools.
 - Keep MCP server key and script naming aligned to `ya-logseq-mcp`.
 - Treat `README.md` as the only onboarding source; this runbook should not duplicate setup steps.
 
@@ -22,7 +22,7 @@ User-facing install/run/config guidance lives in `README.md` and is canonical.
 
 ```bash
 source ~/Workspace/.env
-uv run --project /home/berga/Workspace/projects/ya-logseq-mcp pytest tests/test_server.py -q
+uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/test_server.py -q
 ```
 
 ## Branding Consistency Check
@@ -37,4 +37,19 @@ Optional legacy detector (avoids false positives on canonical `ya-logseq-mcp`):
 
 ```bash
 rg -n -P '(?<!ya-)logseq[-]mcp' README.md RUNBOOK.md pyproject.toml src/logseq_mcp/server.py src/logseq_mcp/__init__.py
+```
+
+## Relocation Stale-Reference Scan
+
+Use this before merges that touch docs, scripts, tests, or runtime configuration:
+
+```bash
+rg -n "projects/logseq-mcp|/home/.*/Workspace/projects/logseq-mcp|/home/.*/Workspace/projects/ya-logseq-mcp" . \
+  -g '!.git/**' \
+  -g '!.venv/**' \
+  -g '!**/__pycache__/**' \
+  -g '!**/.pytest_cache/**' \
+  -g '!.planning/**' \
+  -g '!dist/**' \
+  -g '!build/**'
 ```

@@ -9,7 +9,7 @@
 ## Workspace Relationship
 - **Logseq project page**: `[[Logseq MCP]]` (to be created)
 - **Workspace root**: `~/Workspace/`
-- **Disk path**: `~/Workspace/projects/logseq-mcp/`
+- **Disk path**: `~/Workspace/tools/ya-logseq-mcp/`
 
 ## Why This Exists
 
@@ -30,7 +30,7 @@ Forked graphthulhu MCP had three confirmed problems:
 
 Current v1 layout in this repo:
 ```
-projects/logseq-mcp/
+tools/ya-logseq-mcp/
 ├── CLAUDE.md               ← this file
 ├── pyproject.toml          ← uv project
 ├── src/
@@ -148,7 +148,12 @@ This repo expects that file to provide the Logseq live-test environment, includi
 
 Run:
 ```bash
-uv run python -m logseq_mcp
+uv run --project ~/Workspace/tools/ya-logseq-mcp ya-logseq-mcp
+```
+
+Fallback:
+```bash
+uv run --project ~/Workspace/tools/ya-logseq-mcp python -m logseq_mcp
 ```
 
 ## Implementation Phases

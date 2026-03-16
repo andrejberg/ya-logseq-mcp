@@ -22,7 +22,13 @@ uv sync
 ## Run Locally
 
 ```bash
-LOGSEQ_API_TOKEN=<token> uv run python -m logseq_mcp
+LOGSEQ_API_TOKEN=<token> uv run --project ~/Workspace/tools/ya-logseq-mcp ya-logseq-mcp
+```
+
+Module fallback for troubleshooting:
+
+```bash
+LOGSEQ_API_TOKEN=<token> uv run --project ~/Workspace/tools/ya-logseq-mcp python -m logseq_mcp
 ```
 
 ## MCP Client Config
@@ -37,9 +43,10 @@ Use the script entrypoint name and pin the project path with `--project`:
       "args": [
         "run",
         "--project",
-        "/home/berga/Workspace/projects/ya-logseq-mcp",
+        "~/Workspace/tools/ya-logseq-mcp",
         "ya-logseq-mcp"
       ],
+      "cwd": "~/Workspace/tools/ya-logseq-mcp",
       "env": {
         "LOGSEQ_API_URL": "http://127.0.0.1:12315",
         "LOGSEQ_API_TOKEN": "<token>"
