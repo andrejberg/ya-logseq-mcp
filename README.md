@@ -10,7 +10,7 @@ Python MCP server for Logseq.
 
 Complete this checklist before install:
 
-- [ ] Python 3.12+ is installed: `python --version`
+- [ ] Python 3.12+ is installed: `python3 --version`
 - [ ] `uv` is installed: `uv --version`
 - [ ] Logseq Desktop is running with API enabled:
   `Settings -> Features -> Enable developer mode -> Enable API server`
@@ -24,7 +24,7 @@ Run from a fresh shell:
 ```bash
 set -euo pipefail
 cd ~/Workspace/tools/ya-logseq-mcp
-python --version
+python3 --version
 uv --version
 uv sync
 ```
@@ -115,7 +115,7 @@ Use this when validating docs from a clean environment:
 env -i HOME="$HOME" PATH="$PATH" bash -lc '
   set -euo pipefail
   cd ~/Workspace/tools/ya-logseq-mcp
-  python --version
+  python3 --version
   uv --version
   uv sync
   test -n "${LOGSEQ_API_TOKEN:-}" || echo "LOGSEQ_API_TOKEN not set in fresh shell"
