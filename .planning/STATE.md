@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Packaging and GitHub Release
-current_phase: 9
-current_phase_name: relocation and runtime configuration
-current_plan: 2 of 2
-status: executing
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-16T11:58:06.341Z"
+current_phase: 10
+current_phase_name: installation and onboarding ux
+current_plan: 0 of TBD
+status: ready_for_planning
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-16T12:10:00.000Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
-  percent: 96
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -24,19 +24,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Plan and execute v1.2 packaging/release phases 8-11
+**Current focus:** Plan and execute v1.2 packaging/release phases 10-11
 
 ## Current Position
 
-**Current Phase:** 9
-**Current Phase Name:** relocation and runtime configuration
+**Current Phase:** 10
+**Current Phase Name:** installation and onboarding ux
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** 2 of 2
-**Total Plans in Phase:** 2
-**Status:** Executing
+**Current Plan:** 0 of TBD
+**Total Plans in Phase:** TBD
+**Status:** Ready for planning
 **Last Activity:** 2026-03-16
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ Recent decisions affecting current work:
 - [Phase 08]: Use false-positive-safe legacy detection with (?<!ya-)logseq-mcp and fallback grep filtering.
 - [Phase 09]: Use ~/Workspace/tools/ya-logseq-mcp as canonical runtime path in docs and maintainer guidance.
 - [Phase 09]: Normalize home-relative --project args from MCP config before subprocess launch in integration helper.
+- [Phase 09]: Close requirement traceability using explicit relocation verification evidence in `09-VERIFICATION.md`.
 
 ### Pending Todos
 
@@ -91,5 +92,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-16T11:58:06.339Z
-**Stopped At:** Completed 09-01-PLAN.md
+**Stopped At:** Completed 09-02-PLAN.md
 **Resume File:** None

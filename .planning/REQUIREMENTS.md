@@ -71,6 +71,8 @@ Deferred to future milestones.
 - Mapped to phases: 10
 - Unmapped: 0
 
+Phase 9 relocation evidence: `.planning/phases/09-relocation-and-runtime-configuration/09-VERIFICATION.md`
+
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after v1.2 milestone requirement scoping*
+*Last updated: 2026-03-16 after Phase 9 verification evidence capture*
