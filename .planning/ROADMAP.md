@@ -28,7 +28,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
 
 - [x] **Phase 8: Branding Alignment** - Canonical `ya-logseq-mcp` naming is consistent across package/repo/docs and user-facing entrypoints. (completed 2026-03-13)
 - [x] **Phase 9: Relocation and Runtime Configuration** - Repository move and path assumptions are updated with working dev/test workflows and client config examples. (completed 2026-03-16)
-- [ ] **Phase 10: Installation and Onboarding UX** - Setup documentation is end-to-end runnable from a clean environment with explicit smoke checks.
+- [x] **Phase 10: Installation and Onboarding UX** - Setup documentation is end-to-end runnable from a clean environment with explicit smoke checks. (completed 2026-03-16)
 - [ ] **Phase 11: GitHub Publication Surface** - Public repository publishing and GitHub-home discoverability are complete.
 
 ## Phase Details
@@ -41,7 +41,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
   1. Maintainer can set and verify `ya-logseq-mcp` as the canonical name in package metadata, repository metadata, and core documentation.
   2. User sees the same project name across README, module/CLI entrypoints, and repository branding without conflicting aliases.
   3. User can copy usage examples without encountering old project naming.
-**Plans**: TBD
+**Plans**: 2/2 complete (10-01, 10-02)
 
 ### Phase 9: Relocation and Runtime Configuration
 **Goal**: The project runs from `~/Workspace/tools/ya-logseq-mcp` with updated path assumptions and client configuration examples.
@@ -85,5 +85,5 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
 | 7. Journal Range and Milestone Validation | v1.1 | 3/3 | Complete | 2026-03-13 |
 | 8. Branding Alignment | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 9. Relocation and Runtime Configuration | v1.2 | 2/2 | Complete | 2026-03-16 |
-| 10. Installation and Onboarding UX | v1.2 | 1/2 | In Progress | - |
+| 10. Installation and Onboarding UX | v1.2 | 2/2 | Complete | 2026-03-16 |
 | 11. GitHub Publication Surface | v1.2 | 0/TBD | Not started | - |

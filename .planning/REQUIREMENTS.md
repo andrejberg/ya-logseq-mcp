@@ -72,7 +72,8 @@ Deferred to future milestones.
 - Unmapped: 0
 
 Phase 9 relocation evidence: `.planning/phases/09-relocation-and-runtime-configuration/09-VERIFICATION.md`
+Phase 10 onboarding evidence: `.planning/phases/10-installation-and-onboarding-ux/10-VERIFICATION.md`
 
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-16 after Phase 9 verification evidence capture*
+*Last updated: 2026-03-16 after Phase 10 verification evidence capture*
