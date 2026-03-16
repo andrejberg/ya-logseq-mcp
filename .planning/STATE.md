@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 11
 current_phase_name: github publication surface
-current_plan: 2
-status: executing
+current_plan: Not started
+status: planning
 stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-03-16T14:36:45.371Z"
+last_updated: "2026-03-16T14:42:45.511Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 11
 **Current Phase Name:** github publication surface
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** 2
+**Current Plan:** Not started
 **Total Plans in Phase:** 2
-**Status:** Ready to execute
+**Status:** Ready to plan
 **Last Activity:** 2026-03-16
 
 Progress: [██████████] 100%
