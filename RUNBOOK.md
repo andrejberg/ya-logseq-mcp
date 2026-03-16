@@ -23,6 +23,17 @@ User-facing install/run/config guidance lives in `README.md` and is canonical.
 ```bash
 source ~/Workspace/.env
 uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/test_server.py -q
+uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/integration/test_mcp_stdio.py -x -q -m integration
+```
+
+## README Onboarding Guardrails
+
+Run these checks after editing onboarding docs to prevent stale or incomplete guidance:
+
+```bash
+rg -n "Requirements|Install|Run Locally|MCP Client Config|Smoke Check|equivalent MCP" README.md
+rg -n "If smoke fails|Troubleshooting|RUNBOOK" README.md
+uv run --project ~/Workspace/tools/ya-logseq-mcp python -c 'import json,pathlib,re; t=pathlib.Path("README.md").read_text(); m=re.search(r"```json\\s*(\\{[\\s\\S]*?\\})\\s*```", t); assert m, "README MCP JSON snippet missing"; cfg=json.loads(m.group(1)); servers=cfg.get("mcpServers") or {}; assert servers, "mcpServers missing"; s=next(iter(servers.values())); missing=[k for k in ["command","args","cwd","env"] if k not in s]; assert not missing, missing; assert isinstance(s["args"], list) and s["args"], "args must be non-empty list"; joined=" ".join(str(x) for x in s["args"]); assert ("ya-logseq-mcp" in joined) or ("-m" in s["args"] and "ya_logseq_mcp.server" in joined), "startup semantics mismatch"; print("readme-config-parse-and-startup-ok")'
 ```
 
 ## Branding Consistency Check
