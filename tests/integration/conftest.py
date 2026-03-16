@@ -91,6 +91,23 @@ def _graphthulhu_server_name() -> str:
     return server_name
 
 
+def _normalize_cli_args(args: list[str]) -> list[str]:
+    normalized: list[str] = []
+    expand_next_path = False
+
+    for arg in args:
+        if expand_next_path:
+            normalized.append(str(Path(arg).expanduser()))
+            expand_next_path = False
+            continue
+
+        normalized.append(str(Path(arg).expanduser()) if arg.startswith("~/") else arg)
+        if arg in {"--project"}:
+            expand_next_path = True
+
+    return normalized
+
+
 def _load_external_mcp_server_config(config_path: Path, server_name: str) -> ExternalMcpServerConfig:
     try:
         raw = json.loads(config_path.read_text(encoding="utf-8"))
@@ -133,7 +150,7 @@ def _load_external_mcp_server_config(config_path: Path, server_name: str) -> Ext
 
     return ExternalMcpServerConfig(
         command=command,
-        args=args,
+        args=_normalize_cli_args(args),
         env=env,
         cwd=Path(cwd).expanduser() if cwd else None,
     )
@@ -445,11 +462,12 @@ def _launch_stdio_server(server: StdioServerParameters) -> AsyncIterator[StdioSe
 def launch_stdio_server(
     isolated_graph_env: IsolatedGraphEnv,
 ) -> AsyncIterator[StdioServerHandle]:
+    project_root = Path(__file__).resolve().parents[2]
     server = StdioServerParameters(
         command="uv",
-        args=["run", "python", "-m", "logseq_mcp"],
+        args=["run", "--project", str(project_root), "ya-logseq-mcp"],
         env=_build_stdio_env(isolated_graph_env),
-        cwd=Path(__file__).resolve().parents[2],
+        cwd=project_root,
     )
     return _launch_stdio_server(server)
 

@@ -44,7 +44,8 @@ rg -n -P '(?<!ya-)logseq[-]mcp' README.md RUNBOOK.md pyproject.toml src/logseq_m
 Use this before merges that touch docs, scripts, tests, or runtime configuration:
 
 ```bash
-rg -n "projects/logseq-mcp|/home/.*/Workspace/projects/logseq-mcp|/home/.*/Workspace/projects/ya-logseq-mcp" . \
+LEGACY_PATH_RE="projects/logseq""-mcp|/home/.*/Workspace/projects/logseq""-mcp|/home/.*/Workspace/projects/ya-logseq""-mcp"
+rg -n "$LEGACY_PATH_RE" . \
   -g '!.git/**' \
   -g '!.venv/**' \
   -g '!**/__pycache__/**' \
