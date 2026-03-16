@@ -41,7 +41,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
   1. Maintainer can set and verify `ya-logseq-mcp` as the canonical name in package metadata, repository metadata, and core documentation.
   2. User sees the same project name across README, module/CLI entrypoints, and repository branding without conflicting aliases.
   3. User can copy usage examples without encountering old project naming.
-**Plans**: 2/2 complete (10-01, 10-02)
+**Plans**: 2/2 complete (08-01, 08-02)
 
 ### Phase 9: Relocation and Runtime Configuration
 **Goal**: The project runs from `~/Workspace/tools/ya-logseq-mcp` with updated path assumptions and client configuration examples.
@@ -61,7 +61,7 @@ See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
   1. User can complete installation from a clean environment using documented prerequisites and commands only.
   2. User can configure Claude Desktop (or equivalent MCP clients) via copy-paste-ready configuration examples.
   3. User can run a documented smoke-check flow and confirm the installation is working.
-**Plans**: TBD
+**Plans**: 2/2 complete (10-01, 10-02)
 
 ### Phase 11: GitHub Publication Surface
 **Goal**: The renamed project is publicly published on GitHub with enough guidance to onboard from the repository homepage.

@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 11
 current_phase_name: github publication surface
-current_plan: 01
-status: planning
+current_plan: 2
+status: executing
 stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-03-16T14:07:06.513Z"
+last_updated: "2026-03-16T14:36:45.371Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 11
 **Current Phase Name:** github publication surface
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** 01
+**Current Plan:** 2
 **Total Plans in Phase:** 2
-**Status:** Planning next phase
+**Status:** Ready to execute
 **Last Activity:** 2026-03-16
 
 Progress: [██████████] 100%
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | Phase 09 P01 | 22min | 2 tasks | 4 files |
 | Phase 09 P02 | 4min | 2 tasks | 5 files |
 | Phase 10-installation-and-onboarding-ux P01 | 12min | 3 tasks | 2 files |
+| Phase 10-installation-and-onboarding-ux P02 | 29min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Advance state routing to Phase 10 planning readiness immediately after Phase 9 completion.
 - [Phase 10]: Keep README as canonical onboarding surface and RUNBOOK as maintainer-only verification guardrails.
 - [Phase 10]: Use python3 checks in clean-shell verification to avoid hidden python alias assumptions.
+- [Phase 10]: Treat missing LOGSEQ_API_TOKEN in clean-shell checks as explicit negative-path onboarding evidence.
+- [Phase 10]: Use python3 for clean-shell verification to avoid python alias assumptions.
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T14:07:06.507Z
+Last session: 2026-03-16T14:36:45.361Z
 **Stopped At:** Completed 10-02-PLAN.md
 **Resume File:** None
