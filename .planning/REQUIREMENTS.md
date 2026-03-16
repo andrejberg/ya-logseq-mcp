@@ -14,9 +14,9 @@ Requirements for milestone v1.2 (packaging and GitHub release).
 
 ### Relocation and Configuration
 
-- [ ] **MOVE-01**: Maintainer can relocate the repository to `~/Workspace/tools/ya-logseq-mcp` without breaking local development commands.
-- [ ] **MOVE-02**: Maintainer can run existing scripts/tests after relocation with updated path assumptions and no stale references to the old location.
-- [ ] **MOVE-03**: User can configure clients using updated examples that reference the new project name and location.
+- [x] **MOVE-01**: Maintainer can relocate the repository to `~/Workspace/tools/ya-logseq-mcp` without breaking local development commands.
+- [x] **MOVE-02**: Maintainer can run existing scripts/tests after relocation with updated path assumptions and no stale references to the old location.
+- [x] **MOVE-03**: User can configure clients using updated examples that reference the new project name and location.
 
 ### Documentation and Installation UX
 
@@ -57,9 +57,9 @@ Deferred to future milestones.
 |-------------|-------|--------|
 | BRAND-01 | Phase 8 | Complete |
 | BRAND-02 | Phase 8 | Complete |
-| MOVE-01 | Phase 9 | Pending |
-| MOVE-02 | Phase 9 | Pending |
-| MOVE-03 | Phase 9 | Pending |
+| MOVE-01 | Phase 9 | Complete |
+| MOVE-02 | Phase 9 | Complete |
+| MOVE-03 | Phase 9 | Complete |
 | DOCS-01 | Phase 10 | Pending |
 | DOCS-02 | Phase 10 | Pending |
 | DOCS-03 | Phase 10 | Pending |

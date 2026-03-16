@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 9
 current_phase_name: relocation and runtime configuration
-current_plan: Not started
-status: planning
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-03-13T15:03:29.022Z"
-last_activity: 2026-03-13
+current_plan: 2 of 2
+status: executing
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-16T11:58:06.341Z"
+last_activity: 2026-03-16
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 50
+  total_plans: 4
+  completed_plans: 3
+  percent: 96
 ---
 
 # Project State
@@ -31,12 +31,12 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 9
 **Current Phase Name:** relocation and runtime configuration
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** Not started
+**Current Plan:** 2 of 2
 **Total Plans in Phase:** 2
-**Status:** Ready to plan
-**Last Activity:** 2026-03-13
+**Status:** Executing
+**Last Activity:** 2026-03-16
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [█████░░░░░] 50%
 *Updated after each plan completion*
 | Phase 08 P01 | 2min | 2 tasks | 4 files |
 | Phase 08 P02 | 3min | 2 tasks | 3 files |
+| Phase 09 P01 | 22min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 08]: Added tool.uv.build-backend.module-name=logseq_mcp to preserve package resolution after distribution rename.
 - [Phase 08]: Use README as the only canonical user-facing setup surface and keep RUNBOOK operational-only.
 - [Phase 08]: Use false-positive-safe legacy detection with (?<!ya-)logseq-mcp and fallback grep filtering.
+- [Phase 09]: Use ~/Workspace/tools/ya-logseq-mcp as canonical runtime path in docs and maintainer guidance.
+- [Phase 09]: Normalize home-relative --project args from MCP config before subprocess launch in integration helper.
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13T15:00:44.244Z
-**Stopped At:** Completed 08-02-PLAN.md
+Last session: 2026-03-16T11:58:06.339Z
+**Stopped At:** Completed 09-01-PLAN.md
 **Resume File:** None
