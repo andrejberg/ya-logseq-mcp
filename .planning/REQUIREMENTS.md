@@ -20,9 +20,9 @@ Requirements for milestone v1.2 (packaging and GitHub release).
 
 ### Documentation and Installation UX
 
-- [ ] **DOCS-01**: User can follow installation instructions from a clean environment without hidden prerequisites.
-- [ ] **DOCS-02**: User can configure the MCP server in Claude Desktop (or equivalent MCP clients) using copy-paste-ready examples.
-- [ ] **DOCS-03**: User can verify a successful installation through a documented smoke-check flow.
+- [x] **DOCS-01**: User can follow installation instructions from a clean environment without hidden prerequisites.
+- [x] **DOCS-02**: User can configure the MCP server in Claude Desktop (or equivalent MCP clients) using copy-paste-ready examples.
+- [x] **DOCS-03**: User can verify a successful installation through a documented smoke-check flow.
 
 ### Publishing
 
@@ -60,9 +60,9 @@ Deferred to future milestones.
 | MOVE-01 | Phase 9 | Complete |
 | MOVE-02 | Phase 9 | Complete |
 | MOVE-03 | Phase 9 | Complete |
-| DOCS-01 | Phase 10 | Pending |
-| DOCS-02 | Phase 10 | Pending |
-| DOCS-03 | Phase 10 | Pending |
+| DOCS-01 | Phase 10 | Complete |
+| DOCS-02 | Phase 10 | Complete |
+| DOCS-03 | Phase 10 | Complete |
 | PUB-01 | Phase 11 | Pending |
 | PUB-02 | Phase 11 | Pending |
 

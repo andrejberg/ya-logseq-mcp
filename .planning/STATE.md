@@ -4,16 +4,16 @@ milestone: v1.2
 milestone_name: Packaging and GitHub Release
 current_phase: 10
 current_phase_name: installation and onboarding ux
-current_plan: Not started
-status: planning
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-16T12:13:40.353Z"
+current_plan: 02
+status: executing
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-16T14:07:06.513Z"
 last_activity: 2026-03-16
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
   percent: 100
 ---
 
@@ -31,9 +31,9 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Current Phase:** 10
 **Current Phase Name:** installation and onboarding ux
 **Total Phases:** 4 (phases 8-11 in this milestone)
-**Current Plan:** Not started
-**Total Plans in Phase:** 1
-**Status:** Ready to plan
+**Current Plan:** 02
+**Total Plans in Phase:** 2
+**Status:** In progress
 **Last Activity:** 2026-03-16
 
 Progress: [██████████] 100%
@@ -63,6 +63,7 @@ Progress: [██████████] 100%
 | Phase 08 P02 | 3min | 2 tasks | 3 files |
 | Phase 09 P01 | 22min | 2 tasks | 4 files |
 | Phase 09 P02 | 4min | 2 tasks | 5 files |
+| Phase 10-installation-and-onboarding-ux P01 | 12min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Close requirement traceability using explicit relocation verification evidence in `09-VERIFICATION.md`.
 - [Phase 09]: Close MOVE requirement traceability using explicit command evidence in 09-VERIFICATION.md.
 - [Phase 09]: Advance state routing to Phase 10 planning readiness immediately after Phase 9 completion.
+- [Phase 10]: Keep README as canonical onboarding surface and RUNBOOK as maintainer-only verification guardrails.
+- [Phase 10]: Use python3 checks in clean-shell verification to avoid hidden python alias assumptions.
 
 ### Pending Todos
 
@@ -94,6 +97,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T12:11:25.179Z
-**Stopped At:** Completed 09-02-PLAN.md
+Last session: 2026-03-16T14:07:06.507Z
+**Stopped At:** Completed 10-01-PLAN.md
 **Resume File:** None
