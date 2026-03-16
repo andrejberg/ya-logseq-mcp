@@ -76,6 +76,8 @@ Primary example for Claude Desktop (copy/paste-ready):
 
 equivalent MCP clients (Cursor, VS Code MCP, custom launchers) should use the same
 `command`, `args`, `cwd`, and `env` shape.
+startup semantics: `command` + `args` must launch the `ya-logseq-mcp` entrypoint.
+parse validation for this JSON block is included in the verification commands for this plan.
 
 ## Smoke Check
 
