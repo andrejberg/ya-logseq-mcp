@@ -28,3 +28,8 @@ logseq_docs/
 
 # Claude
 .claude/
+
+# Workspace scaffolding
+.planning/
+logseq-test-graph/
+CLAUDE.md
