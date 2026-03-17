@@ -8,7 +8,7 @@ Python MCP server for Logseq.
 
 ## Why ya-logseq-mcp
 
-`ya-logseq-mcp` is a Python MCP server that exposes Logseq read and write operations as MCP tools, targeting Claude Desktop and any compatible MCP stdio client. It was written to replace a prior Go-based implementation that had a confirmed block-duplication bug and always-verbose enrichment with no lean read path; this server deduplicates blocks by UUID at read time and returns lean responses by default.
+`ya-logseq-mcp` is a Python MCP server that exposes Logseq read and write operations as MCP tools, targeting Claude Desktop and any compatible MCP stdio client. It deduplicates blocks by UUID at read time and returns lean responses by default.
 
 ## Tools
 
@@ -43,11 +43,11 @@ Complete this checklist before install:
 
 ## Install
 
-Run from a fresh shell:
+Clone or copy the repo, then run from the repo root:
 
 ```bash
 set -euo pipefail
-cd ~/Workspace/tools/ya-logseq-mcp
+cd /path/to/ya-logseq-mcp
 python3 --version
 uv --version
 uv sync
@@ -58,13 +58,13 @@ uv sync
 Script-first launch:
 
 ```bash
-LOGSEQ_API_TOKEN=<token> uv run --project ~/Workspace/tools/ya-logseq-mcp ya-logseq-mcp
+LOGSEQ_API_TOKEN=<token> uv run ya-logseq-mcp
 ```
 
 Module fallback for troubleshooting only:
 
 ```bash
-LOGSEQ_API_TOKEN=<token> uv run --project ~/Workspace/tools/ya-logseq-mcp python -m logseq_mcp
+LOGSEQ_API_TOKEN=<token> uv run python -m logseq_mcp
 ```
 
 expected first-run result:
@@ -85,10 +85,10 @@ Primary example for Claude Desktop (copy/paste-ready):
       "args": [
         "run",
         "--project",
-        "~/Workspace/tools/ya-logseq-mcp",
+        "/path/to/ya-logseq-mcp",
         "ya-logseq-mcp"
       ],
-      "cwd": "~/Workspace/tools/ya-logseq-mcp",
+      "cwd": "/path/to/ya-logseq-mcp",
       "env": {
         "LOGSEQ_API_URL": "http://127.0.0.1:12315",
         "LOGSEQ_API_TOKEN": "<token>"
@@ -97,6 +97,8 @@ Primary example for Claude Desktop (copy/paste-ready):
   }
 }
 ```
+
+Replace `/path/to/ya-logseq-mcp` with the absolute path to your cloned repo.
 
 equivalent MCP clients (Cursor, VS Code MCP, custom launchers) should use the same
 `command`, `args`, `cwd`, and `env` shape.
@@ -110,14 +112,14 @@ Run checks in this order:
 1. Unit smoke:
 
 ```bash
-uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/test_server.py -q
+uv run pytest tests/test_server.py -q
 ```
 
 2. MCP stdio integration smoke:
 
 ```bash
-source ~/Workspace/.env
-uv run --project ~/Workspace/tools/ya-logseq-mcp pytest tests/integration/test_mcp_stdio.py -x -q -m integration
+export LOGSEQ_API_TOKEN=<token>
+uv run pytest tests/integration/test_mcp_stdio.py -x -q -m integration
 ```
 
 Pass/fail interpretation:
@@ -128,7 +130,7 @@ Pass/fail interpretation:
 If smoke fails:
 
 1. Re-check token and API availability (`LOGSEQ_API_TOKEN`, Logseq API enabled).
-2. Re-run locally with `uv run --project ~/Workspace/tools/ya-logseq-mcp ya-logseq-mcp --help`.
+2. Re-run locally with `uv run ya-logseq-mcp --help`.
 3. Follow troubleshooting and maintainer checks in `RUNBOOK.md`.
 
 ## Docs-Only Onboarding Verification (fresh shell)
@@ -138,12 +140,12 @@ Use this when validating docs from a clean environment:
 ```bash
 env -i HOME="$HOME" PATH="$PATH" bash -lc '
   set -euo pipefail
-  cd ~/Workspace/tools/ya-logseq-mcp
+  cd /path/to/ya-logseq-mcp
   python3 --version
   uv --version
   uv sync
   test -n "${LOGSEQ_API_TOKEN:-}" || echo "LOGSEQ_API_TOKEN not set in fresh shell"
-  uv run --project ~/Workspace/tools/ya-logseq-mcp ya-logseq-mcp --help >/tmp/phase10_docs_help.txt
+  uv run ya-logseq-mcp --help >/tmp/ya-logseq-mcp-help.txt
 '
 ```
 
@@ -154,7 +156,3 @@ DOCS-01 success markers:
 - startup command reaches ready/no-traceback state (`ya-logseq-mcp --help` exits cleanly)
 
 For maintainers, onboarding accuracy checks live in `RUNBOOK.md`.
-
-## Migration Note
-
-This project was previously referred to as `logseq-mcp`; all current commands and config keys should use `ya-logseq-mcp`.
