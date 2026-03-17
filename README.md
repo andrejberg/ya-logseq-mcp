@@ -6,6 +6,30 @@ Python MCP server for Logseq.
 
 `ya-logseq-mcp` exposes Logseq read/write tools over MCP stdio so MCP clients can automate page and block workflows.
 
+## Why ya-logseq-mcp
+
+`ya-logseq-mcp` is a Python MCP server that exposes Logseq read and write operations as MCP tools, targeting Claude Desktop and any compatible MCP stdio client. It was written to replace a prior Go-based implementation that had a confirmed block-duplication bug and always-verbose enrichment with no lean read path; this server deduplicates blocks by UUID at read time and returns lean responses by default.
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `health` | Ping Logseq and return graph name and page count |
+| `get_page` | Return a page entity and deduplicated block tree by page name |
+| `get_block` | Get a single block by UUID |
+| `list_pages` | List pages with optional namespace filter |
+| `get_references` | Get backlinks to a page (pages that reference this page) |
+| `page_create` | Create a new page with optional properties and initial blocks |
+| `block_append` | Append blocks to a page; accepts flat strings or nested objects with content, properties, and children |
+| `block_update` | Update block content by UUID |
+| `block_delete` | Delete a block by UUID |
+| `delete_page` | Delete a page by name |
+| `rename_page` | Rename a page from old_name to new_name |
+| `move_block` | Move a block before, after, or as a child of a target block |
+| `journal_today` | Get or create today's journal page and return its block tree |
+| `journal_append` | Append blocks to a journal page for a given date |
+| `journal_range` | Return journal entries for all existing pages between start_date and end_date |
+
 ## Requirements
 
 Complete this checklist before install:
