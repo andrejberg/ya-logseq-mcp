@@ -7,7 +7,7 @@ current_phase_name: github publication surface
 current_plan: Not started
 status: completed
 stopped_at: Completed 11-02-PLAN.md (github publication surface - GitHub repo created and pushed)
-last_updated: "2026-03-17T12:08:28.158Z"
+last_updated: "2026-03-17T19:38:41.694Z"
 last_activity: 2026-03-17
 progress:
   total_phases: 4
@@ -21,10 +21,10 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-13)
+See: .planning/PROJECT.md (updated 2026-03-17)
 
 **Core value:** Every read returns correctly structured blocks and every write produces valid Logseq content
-**Current focus:** Plan and execute v1.2 packaging/release phases 10-11
+**Current focus:** Planning next milestone — v1.2 archived and tagged
 
 ## Current Position
 
@@ -33,7 +33,7 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 **Total Phases:** 4 (phases 8-11 in this milestone)
 **Current Plan:** Not started
 **Total Plans in Phase:** 2
-**Status:** Milestone complete
+**Status:** v1.2 milestone complete
 **Last Activity:** 2026-03-17
 
 Progress: [██████████] 100%

@@ -2,79 +2,37 @@
 
 ## Milestones
 
-- ✅ **v1.0 Logseq MCP Server MVP** - Phases 1-4 shipped on 2026-03-12
-- ✅ **v1.1 Journals and Lifecycle Tools** - Phases 5-7 shipped on 2026-03-13
-- 📋 **v1.2 Packaging and GitHub Release** - Phases 8-11 planned
+- ✅ **v1.0 Logseq MCP Server MVP** — Phases 1-4 (shipped 2026-03-12)
+- ✅ **v1.1 Journals and Lifecycle Tools** — Phases 5-7 (shipped 2026-03-13)
+- ✅ **v1.2 Packaging and GitHub Release** — Phases 8-11 (shipped 2026-03-17)
 
 ## Phases
 
 <details>
-<summary>✅ v1.0 Logseq MCP Server MVP (Phases 1-4) - SHIPPED 2026-03-12</summary>
+<summary>✅ v1.0 Logseq MCP Server MVP (Phases 1-4) — SHIPPED 2026-03-12</summary>
 
 See `.planning/milestones/v1.0-ROADMAP.md` for the archived milestone roadmap.
 
 </details>
 
 <details>
-<summary>✅ v1.1 Journals and Lifecycle Tools (Phases 5-7) - SHIPPED 2026-03-13</summary>
+<summary>✅ v1.1 Journals and Lifecycle Tools (Phases 5-7) — SHIPPED 2026-03-13</summary>
 
 See `.planning/milestones/v1.1-ROADMAP.md` for the archived milestone roadmap.
 
 </details>
 
-### 📋 v1.2 Packaging and GitHub Release (Planned)
+<details>
+<summary>✅ v1.2 Packaging and GitHub Release (Phases 8-11) — SHIPPED 2026-03-17</summary>
 
-**Milestone Goal:** Ship the current MCP server as `ya-logseq-mcp` with coherent naming, relocation, onboarding docs, and GitHub publication.
+- [x] Phase 8: Branding Alignment (2/2 plans) — completed 2026-03-13
+- [x] Phase 9: Relocation and Runtime Configuration (2/2 plans) — completed 2026-03-16
+- [x] Phase 10: Installation and Onboarding UX (2/2 plans) — completed 2026-03-16
+- [x] Phase 11: GitHub Publication Surface (2/2 plans) — completed 2026-03-17
 
-- [x] **Phase 8: Branding Alignment** - Canonical `ya-logseq-mcp` naming is consistent across package/repo/docs and user-facing entrypoints. (completed 2026-03-13)
-- [x] **Phase 9: Relocation and Runtime Configuration** - Repository move and path assumptions are updated with working dev/test workflows and client config examples. (completed 2026-03-16)
-- [x] **Phase 10: Installation and Onboarding UX** - Setup documentation is end-to-end runnable from a clean environment with explicit smoke checks. (completed 2026-03-16)
-- [x] **Phase 11: GitHub Publication Surface** - Public repository publishing and GitHub-home discoverability are complete. (completed 2026-03-17)
+See `.planning/milestones/v1.2-ROADMAP.md` for the archived milestone roadmap.
 
-## Phase Details
-
-### Phase 8: Branding Alignment
-**Goal**: Maintainers and users see one canonical project identity (`ya-logseq-mcp`) across metadata, docs, and runtime touchpoints.
-**Depends on**: Phase 7
-**Requirements**: BRAND-01, BRAND-02
-**Success Criteria** (what must be TRUE):
-  1. Maintainer can set and verify `ya-logseq-mcp` as the canonical name in package metadata, repository metadata, and core documentation.
-  2. User sees the same project name across README, module/CLI entrypoints, and repository branding without conflicting aliases.
-  3. User can copy usage examples without encountering old project naming.
-**Plans**: 2/2 complete (08-01, 08-02)
-
-### Phase 9: Relocation and Runtime Configuration
-**Goal**: The project runs from `~/Workspace/tools/ya-logseq-mcp` with updated path assumptions and client configuration examples.
-**Depends on**: Phase 8
-**Requirements**: MOVE-01, MOVE-02, MOVE-03
-**Success Criteria** (what must be TRUE):
-  1. Maintainer can relocate the repository to `~/Workspace/tools/ya-logseq-mcp` and still run development commands successfully.
-  2. Maintainer can run existing scripts/tests after relocation with no stale references to `~/Workspace/projects/logseq-mcp`.
-  3. User can configure MCP clients using examples that point to the new project name and location.
-**Plans**: 2/2 complete (09-01, 09-02)
-
-### Phase 10: Installation and Onboarding UX
-**Goal**: New users can install, configure, and validate the MCP server from docs alone.
-**Depends on**: Phase 9
-**Requirements**: DOCS-01, DOCS-02, DOCS-03
-**Success Criteria** (what must be TRUE):
-  1. User can complete installation from a clean environment using documented prerequisites and commands only.
-  2. User can configure Claude Desktop (or equivalent MCP clients) via copy-paste-ready configuration examples.
-  3. User can run a documented smoke-check flow and confirm the installation is working.
-**Plans**: 2/2 complete (10-01, 10-02)
-
-### Phase 11: GitHub Publication Surface
-**Goal**: The renamed project is publicly published on GitHub with enough guidance to onboard from the repository homepage.
-**Depends on**: Phase 10
-**Requirements**: PUB-01, PUB-02
-**Success Criteria** (what must be TRUE):
-  1. Maintainer can create and push a public GitHub repository for `ya-logseq-mcp` with complete repository metadata.
-  2. User landing on the GitHub repository can find setup, usage, and troubleshooting guidance without external docs.
-**Plans**: 2 plans
-
-Plans:
-- [ ] 11-01-PLAN.md — Pre-publication file prep (gitignore, LICENSE, README pitch + tool table)
-- [ ] 11-02-PLAN.md — GitHub repository creation and push with metadata
+</details>
 
 ## Progress
 
@@ -90,4 +48,4 @@ Plans:
 | 8. Branding Alignment | v1.2 | 2/2 | Complete | 2026-03-13 |
 | 9. Relocation and Runtime Configuration | v1.2 | 2/2 | Complete | 2026-03-16 |
 | 10. Installation and Onboarding UX | v1.2 | 2/2 | Complete | 2026-03-16 |
-| 11. GitHub Publication Surface | 2/2 | Complete    | 2026-03-17 | - |
+| 11. GitHub Publication Surface | v1.2 | 2/2 | Complete | 2026-03-17 |
